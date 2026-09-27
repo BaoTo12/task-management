@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+build/
+target/
+*.war
+*.class
+
+# Compiled CSS for JSP (generated from styles/ in S28)
+backend/src/main/webapp/static/css/
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+
+# Env files (never commit secrets)
+.env
+.env.*
+!.env.example
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.DS_Store
+Thumbs.db
+
+# Tomcat work dir if run locally in repo
+work/
