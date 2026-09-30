@@ -1,0 +1,23 @@
+// React-only styles for TaskCard. Tools (tokens, functions, mixins) come from the shared abstracts;
+// abstracts emit no CSS, so nothing is duplicated (03.10).
+@use '@styles/abstracts' as *;
+
+.badges {
+  display: flex;
+  gap: space(1);
+}
+
+.due {
+  font-size: to-rem(12px);
+  color: theme('text-muted');
+}
+
+// Container query (03.17): the card (.card is a size container) is narrow in a board column.
+// Below 280px of CARD width, badges stack instead of overflowing. A media query couldn't know this:
+// the viewport is wide in both layouts.
+@container (max-width: 280px) {
+  .badges {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

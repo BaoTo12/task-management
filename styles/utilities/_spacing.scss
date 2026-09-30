@@ -1,0 +1,19 @@
+// Spacing utilities generated with @for (03.06): .mt-0 … .mt-8, .mb-*, .gap-*.
+// One source of truth: every value comes from space(), the same scale as components and the styled theme.
+@use '../abstracts' as *;
+
+$max-step: 8;
+
+@for $step from 0 through $max-step {
+  .mt-#{$step} {
+    margin-top: space($step);
+  }
+
+  .mb-#{$step} {
+    margin-bottom: space($step);
+  }
+
+  .gap-#{$step} {
+    gap: space($step);
+  }
+}

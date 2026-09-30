@@ -1,0 +1,40 @@
+@use '../abstracts' as *;
+
+.text-muted {
+  color: theme('text-muted');
+}
+
+.text-danger {
+  color: theme('danger');
+}
+
+.text-truncate {
+  @extend %truncate-line;
+}
+
+// Hide visually but keep available to screen readers
+.visually-hidden {
+  @extend %visually-hidden;
+}
+
+// A "skip to content" link: hidden until focused by keyboard, then shown (same placeholder, grouped selector).
+.skip-link:not(:focus) {
+  @extend %visually-hidden;
+}
+
+// Focused: float above the header, so it doesn't take a row of the page grid.
+.skip-link:focus {
+  position: fixed;
+  top: space(2);
+  left: space(2);
+  z-index: 100;
+  padding: space(2) space(3);
+  border-radius: $radius-md;
+  background: theme('surface');
+  color: theme('primary');
+  @include focus-ring;
+}
+
+.list-plain {
+  @extend %plain-list;
+}

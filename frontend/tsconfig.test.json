@@ -1,0 +1,13 @@
+{
+  // Type-checks the tests. Same compiler rules as the app (extends), its own include and aliases.
+  // src/ is NOT listed: it's checked by tsconfig.app.json; files the tests import from it are resolved through "@/".
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
+    }
+  },
+  "include": ["tests", "src/styled.d.ts", "src/vite-env.d.ts", "src/shared/i18n/i18next.d.ts"]
+}

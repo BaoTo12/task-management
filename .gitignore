@@ -32,3 +32,10 @@ Thumbs.db
 
 # Tomcat work dir if run locally in repo
 work/
+# Vite mode files hold no secrets (S49): commit them
+!frontend/.env.island
+!frontend/.env.war
+
+# Frontend builds copied into the WAR (npm run build:war / build:island, S49)
+backend/src/main/webapp/app/
+backend/src/main/webapp/static/island/

@@ -1,0 +1,34 @@
+// Placeholder selectors (03.08): rule sets that exist ONLY to be @extend-ed. A placeholder emits nothing by itself,
+// so forwarding it from abstracts/ keeps the promise "abstracts emit no CSS".
+//
+// @extend vs @include (03.08):
+// - @extend GROUPS selectors: `.visually-hidden, .skip-link:not(:focus) { …rules once… }`. Smaller CSS for
+//   rule sets that are identical everywhere and take no arguments.
+// - A mixin COPIES the rules into each selector; it takes arguments (truncate($lines), focus-ring($color)).
+// - @extend can't reach across @media (03.16): extend a placeholder only from rules at the same media level.
+@use 'mixins' as *;
+
+/// Hidden visually, still read by screen readers.
+%visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/// A list used for layout, not as a bulleted list.
+%plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/// One line with an ellipsis: the argument-free case of the truncate() mixin, shared instead of copied.
+%truncate-line {
+  @include truncate(1);
+}

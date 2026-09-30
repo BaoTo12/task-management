@@ -1,0 +1,23 @@
+{
+  "name": "task-management",
+  "version": "1.0.0",
+  "description": "TaskFlow: React + Redux Toolkit SPA and JSP admin portal on one Java Servlet backend",
+  "keywords": [],
+  "homepage": "https://github.com/BaoTo12/task-management#readme",
+  "bugs": {
+    "url": "https://github.com/BaoTo12/task-management/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BaoTo12/task-management.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "scripts": {
+    "styles:jsp": "sass styles/main.scss backend/src/main/webapp/static/css/app.css --no-source-map --style=compressed --load-path=styles"
+  },
+  "devDependencies": {
+    "sass": "^1.105.0"
+  }
+}

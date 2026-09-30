@@ -1,0 +1,15 @@
+@use '../abstracts' as *;
+
+// Cascade layer (03.17): see main.scss for the order.
+@layer base {
+  body {
+    font-family: $font-family-base;
+    font-size: to-rem(16px);
+    color: theme('text');
+    background: theme('background');
+  }
+
+  a {
+    color: theme('primary');
+  }
+}

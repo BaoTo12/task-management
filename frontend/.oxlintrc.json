@@ -1,0 +1,87 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-redux",
+            "importNames": ["useSelector", "useDispatch"],
+            "message": "Use useAppSelector / useAppDispatch from '@/app/hooks' (17.06)."
+          }
+        ],
+        "patterns": [
+          {
+            "group": ["@/features/*/**"],
+            "message": "Import another feature through its public API: '@/features/<name>' (its index.ts)."
+          },
+          {
+            "group": ["../../**"],
+            "message": "Don't climb out of your folder with ../../: use '@/shared/…' or '@/features/<name>'."
+          },
+          {
+            "group": ["@tests/**"],
+            "message": "App code never depends on test code."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/app/hooks.ts"],
+      "rules": { "no-restricted-imports": "off" }
+    },
+    {
+      "files": ["src/shared/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/**", "@/app/**", "@/island/**"],
+                "message": "shared/ must not depend on features/, app/ or island/ (dependency direction: app → features → shared)."
+              },
+              {
+                "group": ["../../**"],
+                "message": "Don't climb out of your folder with ../../: use '@/shared/…'."
+              },
+              {
+                "group": ["@tests/**"],
+                "message": "App code never depends on test code."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["tests/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-redux",
+                "importNames": ["useSelector", "useDispatch"],
+                "message": "Use useAppSelector / useAppDispatch from '@/app/hooks' (17.06)."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["../**"],
+                "message": "Tests import by alias: '@/…' (app code, internals allowed), '@tests/…' (fixtures)."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

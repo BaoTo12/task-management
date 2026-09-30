@@ -1,0 +1,113 @@
+{
+  "title": "Tasks",
+  "count_one": "{{count}} task",
+  "count_other": "{{count}} tasks",
+  "refreshing": "refreshing…",
+  "refreshFailed": "Refresh failed: {{message}}",
+  "loadingList": "Loading tasks…",
+  "tasksDone": "tasks done",
+  "view": {
+    "label": "View",
+    "list": "List",
+    "board": "Board"
+  },
+  "newTask": "+ New task",
+  "clearCompleted": "Clear completed ({{count}})",
+  "clearConfirm_one": "Delete {{count}} completed task? $t(common:cannotUndo)",
+  "clearConfirm_other": "Delete {{count}} completed tasks? $t(common:cannotUndo)",
+  "filter": {
+    "label": "Filter by status",
+    "all": "All"
+  },
+  "empty": "No tasks match this filter.",
+  "pager": {
+    "label": "Pages",
+    "previous": "‹ Previous",
+    "next": "Next ›",
+    "perPage": "Per page",
+    "position_one": "Page {{page}} of {{pages}} · {{count}} task",
+    "position_other": "Page {{page}} of {{pages}} · {{count}} tasks"
+  },
+  "details": {
+    "breadcrumb": "Breadcrumb",
+    "noDescription": "No description.",
+    "due": "Due: {{date}}",
+    "noDueDate": "no due date",
+    "edit": "Edit",
+    "back": "Back to list",
+    "delete": "Delete",
+    "deleteConfirm": "Delete \"{{title}}\"? $t(common:cannotUndo)",
+    "priority": "Priority"
+  },
+  "comments": {
+    "heading": "Comments",
+    "refreshing": "· refreshing…",
+    "loading": "Loading comments…",
+    "empty": "No comments yet.",
+    "add": "Add a comment",
+    "post": "Post comment",
+    "posting": "Posting…",
+    "blank": "Write something first.",
+    "showFormatting": "Show formatting"
+  },
+  "search": {
+    "label": "Search",
+    "placeholder": "Search by title…"
+  },
+  "sort": {
+    "label": "Sort by",
+    "dueDate": "Due date",
+    "priority": "Priority",
+    "title": "Title",
+    "direction": "Sort direction: {{dir}}",
+    "asc": "ascending",
+    "desc": "descending"
+  },
+  "categories": {
+    "label": "Categories",
+    "all": "All categories",
+    "uncategorised": "Uncategorised: {{count}}"
+  },
+  "board": {
+    "empty": "Nothing here.",
+    "filter": "Filter the board",
+    "filterPlaceholder": "Type to filter by title…"
+  },
+  "card": {
+    "edit": "Edit",
+    "markDone": "Mark done",
+    "reopen": "Reopen",
+    "due": "Due {{date}}",
+    "titleInput": "Task title",
+    "select": "Select \"{{title}}\"",
+    "due_overdue": "Overdue: was due {{date}}"
+  },
+  "bulk": {
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "complete": "Mark done",
+    "delete": "Delete",
+    "clear": "Clear selection",
+    "deleteConfirm_one": "Delete {{count}} task? $t(common:cannotUndo)",
+    "deleteConfirm_other": "Delete {{count}} tasks? $t(common:cannotUndo)",
+    "label": "Bulk actions",
+    "deleteListConfirm": "Delete {{titles}}? $t(common:cannotUndo)"
+  },
+  "form": {
+    "newTitle": "New task",
+    "editTitle": "Edit task",
+    "title": "Title",
+    "description": "Description",
+    "status": "Status",
+    "priority": "Priority",
+    "dueDate": "Due date",
+    "optional": "Optional",
+    "create": "Create task",
+    "save": "Save changes",
+    "saving": "Saving…",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "unsaved": "Unsaved changes"
+  },
+  "continueTask": "Continue where you left off: <link>{{title}}</link>"
+}

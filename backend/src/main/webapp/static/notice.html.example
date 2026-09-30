@@ -1,0 +1,2 @@
+<!-- Rename to notice.html to show this on the Admin Portal dashboard (dashboard.jsp, <c:import>). Delete it to hide. -->
+<strong>Planned maintenance:</strong> TaskFlow will be unavailable on Saturday from 22:00 to 23:00 UTC.

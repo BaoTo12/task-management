@@ -1,0 +1,6 @@
+// Public API of the design system's tools. Emits NO CSS (placeholders only produce CSS when @extend-ed).
+@forward 'variables';
+@forward 'tokens';
+@forward 'functions';
+@forward 'mixins';
+@forward 'placeholders';
