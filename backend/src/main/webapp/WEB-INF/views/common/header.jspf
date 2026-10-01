@@ -6,7 +6,8 @@
   REQUEST time (<jsp:include>, 39.03), because it's a self-contained widget.
   S44: <html lang> follows the request's language (LocaleFilter's "lang" attribute: screen readers, hyphenation).
 --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="theme" value="${cookie.tf_theme.value == 'dark' or cookie.tf_theme.value == 'light' ? cookie.tf_theme.value : ''}"/>
 <!doctype html>
 <html lang="${empty lang ? 'en' : lang}"<c:if test="${not empty theme}"> data-theme="${theme}"</c:if>>

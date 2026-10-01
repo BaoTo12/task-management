@@ -1,12 +1,12 @@
 <%--
-  S45 (45.10): the audit log. AdminAuditServlet set: auditPage (Page<AuditDao.Event>), types, typeFilter,
+  S45 (45.10): the audit log. AdminAuditController set: auditPage (PageView<AuditEvent>), types, typeFilter,
   loggedInUsers, loggedInSessions, activeSessions. Every value from the log is escaped: usernames of FAILED logins
   are whatever someone typed into the login form (36.10).
 --%>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <fmt:message key="page.audit" var="auditTitle"/>
 <t:layout title="${auditTitle}">
@@ -37,11 +37,8 @@
           <c:forEach items="${auditPage.items}" var="event">
             <tr>
               <td>
-                <%-- LocalDateTime (UTC in the database) → text → Date → formatted in the page's locale (44.13) --%>
-                <fmt:timeZone value="UTC">
-                  <fmt:parseDate value="${event.at}" pattern="yyyy-MM-dd'T'HH:mm" var="eventAt"/>
-                  <fmt:formatDate value="${eventAt}" type="both" dateStyle="short" timeStyle="medium"/>
-                </fmt:timeZone>
+                <%-- AuditEvent.getAtDate(): the Instant as a java.util.Date, which fmt:formatDate can format --%>
+                <fmt:formatDate value="${event.atDate}" type="both" dateStyle="short" timeStyle="medium" timeZone="UTC"/>
               </td>
               <td>${event.type}</td>
               <td><c:out value="${event.username}" default="—"/></td>

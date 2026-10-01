@@ -28,6 +28,7 @@ import { Stack } from '@/shared/ui/styled/Stack';
 import { Board } from '../components/Board';
 import { BulkBar } from '../components/BulkBar';
 import { FilterBar } from '../components/FilterBar';
+import { WorkFilters } from '../components/WorkFilters';
 import { Pager } from '../components/Pager';
 import { SearchBox } from '../components/SearchBox';
 import { TaskList } from '../components/TaskList';
@@ -71,6 +72,10 @@ export function TasksPage() {
   const view: View = searchParams.get('view') === 'board' ? 'board' : 'list';
   const q = searchParams.get('q') ?? '';
   const categoryFilter = parseCategoryParam(searchParams.get('category'));
+  // Team filters (Spring Boot backend): same validation as category, the URL is user input.
+  const projectFilter = parseCategoryParam(searchParams.get('project'));
+  const labelFilter = parseCategoryParam(searchParams.get('label'));
+  const mineOnly = searchParams.get('mine') === '1';
   // ?page=2 in the URL is 1-based for humans; the API is 0-based (23.07).
   const pageParam = Number(searchParams.get('page'));
   const page = Number.isInteger(pageParam) && pageParam >= 1 ? pageParam - 1 : 0;
@@ -99,6 +104,9 @@ export function TasksPage() {
     q: debouncedQ || undefined,
     status: statusFilter ?? undefined,
     categoryId: categoryFilter ?? undefined,
+    projectId: projectFilter ?? undefined,
+    labelId: labelFilter ?? undefined,
+    assigneeId: mineOnly && user ? user.id : undefined,
     sort: `${sort.key},${sort.direction}`,
     page,
     size: pageSize,
@@ -159,6 +167,7 @@ export function TasksPage() {
         <>
           <CategorySidebar selected={categoryFilter} />
           <FilterBar value={statusFilter} onChange={(s) => setParam('status', s)} />
+          <WorkFilters projectId={projectFilter} labelId={labelFilter} mine={mineOnly} onChange={setParam} />
           <BulkBar />
           <div style={{ opacity: pageResult.isFetching ? 0.6 : 1 }} aria-busy={pageResult.isFetching}>
             <TaskList

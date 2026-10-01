@@ -1,0 +1,17 @@
+{
+  "title": "Reports",
+  "from": "From",
+  "to": "To",
+  "asTable": "Show as table",
+  "asBars": "Show as bars",
+  "refresh": "Refresh",
+  "totals": "{{created}} created · {{completed}} completed · {{open}} open · {{overdue}} overdue",
+  "completion": "completion {{rate}}",
+  "busiest": "busiest day {{date}} ({{count}})",
+  "byStatus": "By status",
+  "byPriority": "By priority",
+  "perDay": "Completed per day",
+  "range": "{{from}} → {{to}}",
+  "defaultRange": "The last 30 days",
+  "export": "Export CSV"
+}

@@ -4,5 +4,5 @@
   request's attributes (flash) and parameters. It sets no content type: the including page owns the response.
 --%>
 <%@ page pageEncoding="UTF-8" session="false" trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:if test="${not empty flash}"><p class="flash" role="status"><c:out value="${flash}"/></p></c:if>

@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 
 import { readListPrefsCookie } from '@/features/listPrefs';
+import { createTimerMiddleware } from '@/features/timeTracking';
 
 import { apiSlice } from '@/shared/api/apiSlice';
 import * as taskflowApi from '@/shared/api/endpoints';
@@ -28,6 +29,7 @@ export function makeStore(preloadedState?: Partial<RootState>, extraOverrides?: 
   const crashReporter = createCrashReporter((crash) => console.error('[crash]', crash.actionType, crash)); // S27: a real endpoint
   const analytics = createAnalyticsMiddleware((event) => console.info('[analytics]', event)); // placeholder sink
   const listeners = createAppListenerMiddleware(extra); // reactive logic, 21.14
+  const timer = createTimerMiddleware(); // a hand-written middleware: ticks while a timer runs
 
   return configureStore({
     reducer: rootReducer,
@@ -36,7 +38,7 @@ export function makeStore(preloadedState?: Partial<RootState>, extraOverrides?: 
     middleware: (getDefaultMiddleware) => {
       const chain = getDefaultMiddleware({ thunk: { extraArgument: extra } })
         .prepend(crashReporter, listeners.middleware) // crash reporter first: wraps all
-        .concat(apiSlice.middleware); // RTK Query: runs the requests, counts subscriptions, refetches (22.04)
+        .concat(apiSlice.middleware, timer); // RTK Query: runs the requests, counts subscriptions, refetches (22.04)
       return import.meta.env.DEV ? chain.concat(createLoggerMiddleware(), analytics) : chain.concat(analytics);
     },
     devTools: import.meta.env.DEV, // the Redux DevTools extension, development only (14.11 §5)

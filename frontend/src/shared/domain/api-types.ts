@@ -2,7 +2,8 @@ import type { Task } from './types';
 
 // ── Requests: what the client SENDS ─────────────────────────────────────────
 /** Fields the server generates or controls are excluded: the client can't set them. */
-export type CreateTaskRequest = Omit<Task, 'id' | 'ownerId' | 'createdAt' | 'updatedAt'>;
+export type CreateTaskRequest = Omit<Task, 'id' | 'ownerId' | 'createdAt' | 'updatedAt' | 'completedAt' | 'labelIds' | 'projectId' | 'assigneeId'> &
+  Partial<Pick<Task, 'projectId' | 'assigneeId'>>;
 
 /** PATCH semantics: any subset of the editable fields. */
 export type UpdateTaskRequest = Partial<CreateTaskRequest>;
@@ -15,6 +16,16 @@ export interface Page<T> {
   size: number;
   totalItems: number;
   totalPages: number;
+}
+
+/**
+ * A CURSOR page (notifications, activity): `nextCursor` is the id to send as ?before= for the next (older) page,
+ * null when there's nothing older. Used as the pageParam of RTK Query infinite queries.
+ */
+export interface CursorPage<T> {
+  items: T[];
+  nextCursor: number | null;
+  unreadCount: number | null;
 }
 
 /** Standard error body for every non-2xx response. */

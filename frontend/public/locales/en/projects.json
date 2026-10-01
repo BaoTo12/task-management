@@ -1,0 +1,33 @@
+{
+  "title": "Projects",
+  "loading": "Loading projects…",
+  "empty": "No projects yet: create the first one.",
+  "archived": "Archived",
+  "members_one": "{{count}} member",
+  "members_other": "{{count}} members",
+  "membersTitle_one": "{{count}} member",
+  "membersTitle_other": "{{count}} members",
+  "role": {
+    "OWNER": "Owner",
+    "MAINTAINER": "Maintainer",
+    "MEMBER": "Member",
+    "VIEWER": "Viewer"
+  },
+  "roleOf": "Role of {{name}}",
+  "remove": "Remove",
+  "leave": "Leave",
+  "invite": "Add a member",
+  "progress": "{{done}} of {{total}} tasks done",
+  "newTask": "New task in this project",
+  "rename": "Rename",
+  "archive": "Archive",
+  "unarchive": "Unarchive",
+  "delete": "Delete project",
+  "tasks": "Tasks",
+  "form": {
+    "name": "Name",
+    "color": "Colour",
+    "create": "Create project",
+    "creating": "Creating…"
+  }
+}

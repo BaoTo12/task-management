@@ -1,0 +1,31 @@
+{
+  "title": "Dự án",
+  "loading": "Đang tải dự án…",
+  "empty": "Chưa có dự án nào: hãy tạo dự án đầu tiên.",
+  "archived": "Đã lưu trữ",
+  "members_other": "{{count}} thành viên",
+  "membersTitle_other": "{{count}} thành viên",
+  "role": {
+    "OWNER": "Chủ sở hữu",
+    "MAINTAINER": "Người duy trì",
+    "MEMBER": "Thành viên",
+    "VIEWER": "Người xem"
+  },
+  "roleOf": "Vai trò của {{name}}",
+  "remove": "Xoá",
+  "leave": "Rời dự án",
+  "invite": "Thêm thành viên",
+  "progress": "Hoàn thành {{done}}/{{total}} công việc",
+  "newTask": "Công việc mới trong dự án này",
+  "rename": "Đổi tên",
+  "archive": "Lưu trữ",
+  "unarchive": "Bỏ lưu trữ",
+  "delete": "Xoá dự án",
+  "tasks": "Công việc",
+  "form": {
+    "name": "Tên",
+    "color": "Màu",
+    "create": "Tạo dự án",
+    "creating": "Đang tạo…"
+  }
+}

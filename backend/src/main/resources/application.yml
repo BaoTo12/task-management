@@ -1,0 +1,103 @@
+# TaskFlow configuration. Every value can be overridden by an environment variable with the "relaxed binding" name:
+#   spring.datasource.password  →  SPRING_DATASOURCE_PASSWORD        taskflow.cors.allowed-origins → TASKFLOW_CORS_ALLOWEDORIGINS
+# Secrets below are DEVELOPMENT values only; production passes them through the environment, never through git.
+
+server:
+  port: 8081                          # 8080 belongs to the local Apache httpd
+  servlet:
+    context-path: /taskflow           # the same URLs as the WAR on a standalone Tomcat (/taskflow/...)
+    encoding:
+      charset: UTF-8
+      force: true                     # requests AND responses: what CharacterEncodingFilter did in the servlet era
+    session:
+      timeout: 15m                    # idle timeout (the old web.xml <session-timeout>)
+      tracking-modes: cookie          # never ;jsessionid= in URLs
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${taskflow.secure-cookies}
+    context-parameters:
+      greeting: "Xin chào từ TaskFlow!"   # read by TimeServlet with getServletContext().getInitParameter("greeting")
+  error:
+    whitelabel:
+      enabled: false                  # our JSP error pages (WEB-INF/views/error/*.jsp), never Spring's default page
+    include-stacktrace: never
+    include-message: never
+  tomcat:
+    max-swallow-size: 2MB
+
+spring:
+  application:
+    name: taskflow
+  mvc:
+    view:                             # "tasks/list" → /WEB-INF/views/tasks/list.jsp (see WebMvcConfig.viewResolver)
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+    async:
+      request-timeout: 30s            # StreamingResponseBody (CSV export) and SSE get at most this long by default
+  messages:
+    basename: i18n/messages           # ONE bundle for JSPs (<fmt:message>), controllers (Messages) and validation
+    encoding: UTF-8
+    fallback-to-system-locale: false  # an English request on a Vietnamese server still gets the BASE bundle
+  servlet:
+    multipart:
+      max-file-size: 512KB            # the CSV import: bigger uploads are refused before our code runs
+      max-request-size: 1MB
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      write-dates-as-timestamps: false   # Instant → "2026-09-01T08:00:00Z", LocalDate → "2026-10-03"
+    deserialization:
+      fail-on-unknown-properties: false  # extra fields ("ownerId") have nowhere to go: mass assignment is impossible
+
+  # ── PROVIDED data layer ─────────────────────────────────────────────────────────────────────────────
+  # Two accounts (db/01-database-and-users.sql): Flyway migrates as taskflow_migrator (DDL rights),
+  # the application runs as taskflow_app (data rights only: a SQL injection can't DROP anything).
+  datasource:
+    url: jdbc:mysql://localhost:3306/taskflow?serverTimezone=UTC&characterEncoding=UTF-8
+    username: taskflow_app
+    password: taskflow_dev_pw
+    hikari:
+      maximum-pool-size: 10
+  flyway:
+    user: taskflow_migrator
+    password: taskflow_migrator_dev_pw
+    locations: classpath:db/migration
+  jpa:
+    open-in-view: false               # no lazy loading from views: services return everything a page or DTO needs
+    hibernate:
+      ddl-auto: none                  # Flyway owns the schema; Hibernate never changes it
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        default_batch_fetch_size: 50  # task labels for a page of tasks: one query per 50 tasks, not one per task
+  cache:
+    cache-names: categories
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info          # /taskflow/actuator/health for docker and uptime checks; nothing else
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{requestId:-no-request}] %logger{24} - %msg%n"
+  level:
+    org.hibernate.SQL: WARN
+
+# ── TaskFlow's own settings (com.taskflow.config.TaskflowProperties) ─────────────────────────────────────
+taskflow:
+  secure-cookies: false               # true behind HTTPS: JSESSIONID, XSRF-TOKEN and preference cookies get Secure
+  cors:
+    allowed-origins: http://localhost:5173   # the Vite dev server; comma-separated
+  slow-request-millis: 500            # slower requests become SLOW_REQUEST audit events
+  login-throttle:
+    max-per-account: 5
+    max-per-ip: 20
+    period: 15m
+  csv-import:
+    max-rows: 500

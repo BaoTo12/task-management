@@ -33,14 +33,26 @@ src/
 │   ├── listPrefs/              sort + page size slice, its cookie (S24), SortControl
 │   ├── preferences/            remembered cookies (last opened task)
 │   ├── search/                 quick find: slice, debounced listener, QuickFind box
-│   └── ui/                     uiSlice (selection, toasts), toastActions, ToastProvider (renders the store's toasts)
+│   ├── ui/                     uiSlice (selection, toasts), toastActions, ToastProvider (renders the store's toasts)
+│   │
+│   │   ── team features (Spring Boot backend) ──
+│   ├── people/                 the users directory: entity adapter, createAsyncThunk (condition), lazy search, batching listener
+│   ├── projects/               projects + members: normalised cache, optimistic/pessimistic writes, structured selectors, pages
+│   ├── notifications/          inbox (infinite query), unread count (polling + SSE streaming), createReducer UI state, toasts
+│   ├── activity/               the feed: buildCreateSlice + create.asyncThunk, cursor paging, abort on unmount
+│   ├── subtasks/               checklist API + a local draft with undo/redo (createReducer wrapped by a reducer enhancer)
+│   ├── labels/                 labels cache, optimistic setTaskLabels across every cached list, inverted-index selector
+│   ├── timeTracking/           time entries, the running timer mirrored in a slice, a custom timer middleware
+│   └── reports/                LEGACY classic Redux (createStore, combineReducers, connect, redux-thunk, reselect) + MIGRATION.md
 │
-├── island/                     S49: React islands mounted inside JSP pages (a second shell, like app/)
+├── island/                     S49: React islands mounted inside JSP pages (a second shell, like app/);
+│                               reportsIsland.tsx runs the legacy reports module in its own classic store
 │
 ├── shared/                     no feature knowledge: usable by any feature
 │   ├── api/                    client.ts (Axios + interceptors), api-error, cookies (js-cookie wrapper),
 │   │                           axiosBaseQuery, apiSlice (the ONE RTK Query api), tasks-api + endpoints (thunk extra.api)
 │   ├── session/                authActions: loggedOut, sessionExpired (events every slice reacts to)
+│   ├── state/                  undoable(): a generic undo/redo reducer enhancer
 │   ├── domain/                 types, api-types, guards, format, color
 │   ├── hooks/                  useDebounce, useCookieState, useToday, useAutosizeTextarea
 │   ├── i18n/                   i18next setup, format helpers, LanguageSwitcher, useErrorMessage (S25)

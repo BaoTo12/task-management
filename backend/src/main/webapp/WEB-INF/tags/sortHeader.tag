@@ -8,8 +8,8 @@
 <%@ attribute name="current" required="true" %>
 <%@ attribute name="descending" required="true" type="java.lang.Boolean" %>
 <%@ attribute name="keep" required="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:set var="active" value="${column == current}"/>
 <c:url var="href" value="/tasks">
   <c:forEach items="${fn:split(keep, ',')}" var="name">

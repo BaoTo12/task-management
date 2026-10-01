@@ -1,11 +1,11 @@
 <%--
-  S42 (42.07): user management. AdminUsersServlet set: accounts (UserDao.Account), roles, csrfToken (the filter).
+  S42 (42.07): user management. AdminUsersController set: accounts (User entities), roles. Each form carries ${_csrf.token}.
   The admin's own row has no forms: the service refuses self-changes anyway (defence in depth, 42.06).
 --%>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ include file="/WEB-INF/views/common/header.jspf" %>
     <h1 class="page__title"><fmt:message key="page.users"/></h1>
 
@@ -24,7 +24,7 @@
             <c:otherwise>
               <td>
                 <form method="post" action="<c:url value='/admin/users/role'/>" class="inline-form">
-                  <input type="hidden" name="_csrf" value="${csrfToken}">
+                  <input type="hidden" name="_csrf" value="${_csrf.token}">
                   <input type="hidden" name="id" value="${account.id}">
                   <fmt:message key="users.roleOf" var="roleLabel"><fmt:param value="${account.username}"/></fmt:message>
                   <select name="role" aria-label="${fn:escapeXml(roleLabel)}">
@@ -38,7 +38,7 @@
               <td>
                 <c:set var="statusAction" value="${account.enabled ? '/admin/users/disable' : '/admin/users/enable'}"/>
                 <form method="post" action="<c:url value='${statusAction}'/>" class="inline-form">
-                  <input type="hidden" name="_csrf" value="${csrfToken}">
+                  <input type="hidden" name="_csrf" value="${_csrf.token}">
                   <input type="hidden" name="id" value="${account.id}">
                   <fmt:message key="${account.enabled ? 'users.enabled' : 'users.disabled'}"/>
                   <button class="btn btn--sm btn--secondary" type="submit"><fmt:message key="${account.enabled ? 'users.disable' : 'users.enable'}"/></button>

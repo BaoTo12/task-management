@@ -1,11 +1,19 @@
 import { skipToken } from '@reduxjs/toolkit/query/react';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
+import { useAppSelector } from '@/app/hooks';
+
+import { ActivityFeed } from '@/features/activity';
 import { useAuth } from '@/features/auth';
 import { CommentsSection } from '@/features/comments';
+import { LabelChips, LabelPicker } from '@/features/labels';
+import { UserName } from '@/features/people';
 import { rememberLastTask } from '@/features/preferences';
+import { selectProjectById } from '@/features/projects';
+import { ChecklistSection } from '@/features/subtasks';
+import { TimeSection } from '@/features/timeTracking';
 
 import { isNotFoundError } from '@/shared/api/api-error';
 import { useDeleteTaskMutation, useGetTaskQuery, usePatchTaskMutation } from '@/shared/api/apiSlice';
@@ -26,6 +34,7 @@ import { Stack } from '@/shared/ui/styled/Stack';
 import { PriorityBadge, StatusBadge } from '../components/Badge';
 import { PriorityBar } from '../components/PriorityBar';
 import { backToListHref, parseTaskId } from '../model/list-link';
+import { canEditTask } from '../model/task-access';
 
 export function TaskDetailsPage() {
   const { id: rawId } = useParams();
@@ -45,6 +54,7 @@ export function TaskDetailsPage() {
   const errorMessage = useErrorMessage();
   const today = useToday();
   const loadedId = task?.id;
+  const project = useAppSelector((state) => (task?.projectId ? selectProjectById(state, task.projectId) : undefined));
   // 24.16: remember the last task this user OPENED (a session cookie), once it really loaded.
   useEffect(() => {
     if (loadedId !== undefined) rememberLastTask(loadedId);
@@ -63,6 +73,7 @@ export function TaskDetailsPage() {
     );
   }
   const current = task; // a const the async handler can close over safely (05.07 §4)
+  const editable = canEditTask(task, user, project?.myRole);
 
   async function handleDelete() {
     const confirmed = await confirmDialog.current?.confirm({
@@ -124,7 +135,20 @@ export function TaskDetailsPage() {
           </Button>
         )}
       </Stack>
+      <dl className="task__placement">
+        <dt>{t('details.project')}</dt>
+        <dd>{project ? <Link to={`/projects/${project.id}`}>{project.name}</Link> : t('form.noProject')}</dd>
+        <dt>{t('details.assignee')}</dt>
+        <dd>
+          <UserName id={task.assigneeId} />
+        </dd>
+      </dl>
+      <LabelChips labelIds={task.labelIds} />
+      <LabelPicker taskId={task.id} labelIds={task.labelIds} canEdit={editable} />
+      <ChecklistSection taskId={task.id} canEdit={editable} />
+      <TimeSection taskId={task.id} canEdit={editable} />
       <CommentsSection taskId={task.id} />
+      <ActivityFeed kind="task" id={task.id} />
       <ConfirmDialog ref={confirmDialog} />
     </article>
   );

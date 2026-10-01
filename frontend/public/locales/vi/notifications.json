@@ -1,0 +1,36 @@
+{
+  "title": "Thông báo",
+  "bell_other": "{{count}} thông báo chưa đọc",
+  "loading": "Đang tải…",
+  "empty": "Không có thông báo nào.",
+  "unreadOnly": "Chỉ chưa đọc",
+  "markAllRead": "Đánh dấu tất cả đã đọc",
+  "markRead": "Đánh dấu đã đọc",
+  "open": "Mở",
+  "more": "Tải thêm",
+  "settings": "Cài đặt thông báo bật lên",
+  "type": {
+    "TASK_ASSIGNED": "đã giao cho bạn “{{subject}}”",
+    "TASK_STATUS_CHANGED": "đã đổi trạng thái “{{subject}}”",
+    "TASK_DELETED": "đã xoá “{{subject}}”",
+    "COMMENT_ADDED": "đã bình luận về “{{subject}}”",
+    "PROJECT_INVITED": "đã thêm bạn vào dự án “{{subject}}”",
+    "PROJECT_REMOVED": "đã xoá bạn khỏi dự án “{{subject}}”"
+  },
+  "toast": {
+    "TASK_ASSIGNED": "Việc mới cho bạn: {{subject}}",
+    "TASK_STATUS_CHANGED": "Đổi trạng thái: {{subject}}",
+    "TASK_DELETED": "Đã xoá: {{subject}}",
+    "COMMENT_ADDED": "Bình luận mới: {{subject}}",
+    "PROJECT_INVITED": "Bạn đã tham gia {{subject}}",
+    "PROJECT_REMOVED": "Bạn đã rời {{subject}}"
+  },
+  "toastFor": {
+    "TASK_ASSIGNED": "Giao việc",
+    "TASK_STATUS_CHANGED": "Đổi trạng thái",
+    "TASK_DELETED": "Xoá công việc",
+    "COMMENT_ADDED": "Bình luận",
+    "PROJECT_INVITED": "Lời mời dự án",
+    "PROJECT_REMOVED": "Rời dự án"
+  }
+}

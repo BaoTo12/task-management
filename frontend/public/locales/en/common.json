@@ -8,7 +8,10 @@
     "login": "Log in",
     "logout": "Log out",
     "settings": "Settings",
-    "skip": "Skip to content"
+    "skip": "Skip to content",
+    "projects": "Projects",
+    "reports": "Reports",
+    "notifications": "Notifications"
   },
   "language": {
     "label": "Language",
@@ -102,5 +105,10 @@
     "saving": "Saving…",
     "saved": "Settings saved."
   },
-  "cannotUndo": "This cannot be undone."
+  "cannotUndo": "This cannot be undone.",
+  "people": {
+    "nobody": "Nobody",
+    "unknown": "User #{{id}}",
+    "noMatch": "Nobody matches."
+  }
 }

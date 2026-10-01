@@ -1,6 +1,22 @@
-import type { ApiError, Page } from './api-types';
-import { PRIORITIES, TASK_STATUSES } from './types';
-import type { Category, Comment, Priority, Task, TaskStatus, User } from './types';
+import type { ApiError, CursorPage, Page } from './api-types';
+import { ACTIVITY_TYPES, NOTIFICATION_TYPES, PRIORITIES, PROJECT_ROLES, TASK_STATUSES } from './types';
+import type {
+  Activity,
+  AppNotification,
+  Category,
+  Comment,
+  Label,
+  Member,
+  Priority,
+  Project,
+  ReportSummary,
+  Subtask,
+  Task,
+  TaskStatus,
+  TimeEntry,
+  User,
+  UserSummary,
+} from './types';
 
 /** Compile-time exhaustiveness helper: only callable with `never`. */
 /**
@@ -29,6 +45,8 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 const isStringOrNull = (value: unknown): value is string | null =>
   value === null || typeof value === 'string';
 
+const isNumberOrNull = (value: unknown): value is number | null => value === null || typeof value === 'number';
+
 export function isCategory(value: unknown): value is Category {
   // color is validated again before it reaches CSS (isSafeHexColor, 10.10): here we only check the shape.
   return isObject(value) && typeof value.id === 'number' && typeof value.name === 'string' && typeof value.color === 'string';
@@ -55,10 +73,14 @@ export function isTask(value: unknown): value is Task {
     isTaskStatus(value.status) &&
     isPriority(value.priority) &&
     isStringOrNull(value.dueDate) &&
-    (value.categoryId === null || typeof value.categoryId === 'number') &&
+    isNumberOrNull(value.categoryId) &&
+    isNumberOrNull(value.projectId) &&
     typeof value.ownerId === 'number' &&
+    isNumberOrNull(value.assigneeId) &&
+    Array.isArray(value.labelIds) &&
     typeof value.createdAt === 'string' &&
-    typeof value.updatedAt === 'string'
+    typeof value.updatedAt === 'string' &&
+    isStringOrNull(value.completedAt)
   );
 }
 
@@ -116,3 +138,67 @@ export function isUser(value: unknown): value is User {
     (value.locale === 'en' || value.locale === 'vi')
   );
 }
+
+// ── Spring Boot backend additions ───────────────────────────────────────────
+
+export function isUserSummary(value: unknown): value is UserSummary {
+  return isObject(value) && typeof value.id === 'number' && typeof value.username === 'string' && typeof value.displayName === 'string';
+}
+
+export function isProject(value: unknown): value is Project {
+  return (
+    isObject(value) &&
+    typeof value.id === 'number' &&
+    typeof value.name === 'string' &&
+    typeof value.color === 'string' &&
+    typeof value.archived === 'boolean' &&
+    isOneOf(PROJECT_ROLES, value.myRole) &&
+    typeof value.memberCount === 'number'
+  );
+}
+
+export function isMember(value: unknown): value is Member {
+  return isObject(value) && typeof value.projectId === 'number' && typeof value.userId === 'number' && isOneOf(PROJECT_ROLES, value.role);
+}
+
+export function isSubtask(value: unknown): value is Subtask {
+  return isObject(value) && typeof value.id === 'number' && typeof value.taskId === 'number' && typeof value.title === 'string' && typeof value.done === 'boolean';
+}
+
+export function isLabel(value: unknown): value is Label {
+  return isObject(value) && typeof value.id === 'number' && typeof value.name === 'string' && typeof value.color === 'string';
+}
+
+export function isTimeEntry(value: unknown): value is TimeEntry {
+  return (
+    isObject(value) &&
+    typeof value.id === 'number' &&
+    typeof value.taskId === 'number' &&
+    typeof value.startedAt === 'string' &&
+    isStringOrNull(value.endedAt) &&
+    typeof value.minutes === 'number'
+  );
+}
+
+export function isNotification(value: unknown): value is AppNotification {
+  return isObject(value) && typeof value.id === 'number' && isOneOf(NOTIFICATION_TYPES, value.type) && typeof value.read === 'boolean';
+}
+
+export function isActivity(value: unknown): value is Activity {
+  return isObject(value) && typeof value.id === 'number' && isOneOf(ACTIVITY_TYPES, value.type) && typeof value.subject === 'string';
+}
+
+/** Generic guard for the cursor envelope, like isPageOf for numbered pages. */
+export function isCursorPageOf<T>(value: unknown, isItem: (item: unknown) => item is T): value is CursorPage<T> {
+  return isObject(value) && Array.isArray(value.items) && value.items.every(isItem) && isNumberOrNull(value.nextCursor);
+}
+
+/** Only the envelope: the report is read-only data that goes straight to the screen. */
+export function isReportSummary(value: unknown): value is ReportSummary {
+  return isObject(value) && isObject(value.totals) && Array.isArray(value.completedPerDay) && typeof value.trackedMinutes === 'number';
+}
+
+export const isArrayOf =
+  <T,>(isItem: (item: unknown) => item is T) =>
+  (value: unknown): value is T[] =>
+    Array.isArray(value) && value.every(isItem);

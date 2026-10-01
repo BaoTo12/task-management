@@ -1,209 +1,300 @@
 package com.taskflow.service;
 
-import com.taskflow.dao.CommentDao;
-import com.taskflow.dao.TaskDao;
-import com.taskflow.dao.TaskFilter;
-import com.taskflow.dao.TaskSort;
-import com.taskflow.dao.UserDao;
-import com.taskflow.model.Category;
-import com.taskflow.model.Comment;
-import com.taskflow.model.CommentDetails;
-import com.taskflow.model.Task;
-import com.taskflow.model.TaskDetails;
-import com.taskflow.model.TaskStatus;
-import com.taskflow.security.AccessDeniedException;
+import static com.taskflow.repository.criteria.TaskSpecifications.hasPriority;
+import static com.taskflow.repository.criteria.TaskSpecifications.hasStatus;
+import static com.taskflow.repository.criteria.TaskSpecifications.matching;
+import static com.taskflow.repository.criteria.TaskSpecifications.openAndDue;
+
+import com.taskflow.dto.view.PageView;
+import com.taskflow.dto.view.TaskDetails;
+import com.taskflow.entity.Category;
+import com.taskflow.entity.Priority;
+import com.taskflow.entity.Project;
+import com.taskflow.entity.ProjectRole;
+import com.taskflow.entity.Task;
+import com.taskflow.entity.TaskStatus;
+import com.taskflow.event.TaskEvents;
+import com.taskflow.event.TaskRef;
+import com.taskflow.exception.DuplicateException;
+import com.taskflow.exception.FieldValidationException;
+import com.taskflow.exception.ForbiddenException;
+import com.taskflow.exception.NotFoundException;
+import com.taskflow.repository.CommentRepository;
+import com.taskflow.repository.LabelRepository;
+import com.taskflow.repository.ProjectMemberRepository;
+import com.taskflow.repository.ProjectRepository;
+import com.taskflow.repository.SubtaskRepository;
+import com.taskflow.repository.TaskRepository;
+import com.taskflow.repository.TimeEntryRepository;
+import com.taskflow.repository.UserRepository;
+import com.taskflow.repository.criteria.TaskQuery;
 import com.taskflow.security.AuthUser;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.Set;
+import java.util.function.Consumer;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * PROVIDED (S36): the task use cases. Controllers call THIS, never a DAO directly (36.02).
- * It knows the domain rules ("toggle" means DONE ↔ TODO, a comment needs an existing task) and combines DAOs
- * (details = task + category + owner + comments). It knows nothing about HTTP: no request, no response, no JSP.
- * One instance per application, created by AppContextListener (36.04); it has no per-request state, so it's thread-safe.
+ * The task use cases. Controllers (JSP and REST alike) call THIS, never a repository: same rules for both clients.
+ * It knows nothing about HTTP: no request, no response, no view.
  *
- * S42: every use case takes the CALLER (the logged-in AuthUser). The access rule lives in exactly two methods:
- *   visible(id, caller)  one task: its owner or an admin; someone else's task → AccessDeniedException (42.05)
- *   ownerScope(caller)   lists and counts: an admin sees every owner (null), a user only themselves (42.09)
- * No controller, filter or view repeats the rule: they can't forget it, and changing it is a one-place change.
+ * Every use case takes the CALLER. The access rules live in TaskAccess; this class applies them in two ways:
+ *   one task:   load it, then canView / canEdit / canDelete, else ForbiddenException
+ *   lists:      the "visible" Specification is ANDed into every query, so no list can contain someone else's task
+ *
+ * Transactions: @Transactional(readOnly = true) on the class is the default for every method (a read-only transaction:
+ * Hibernate skips dirty checking); the methods that write override it with @Transactional. The proxy Spring puts
+ * around this bean opens the transaction before the method and commits (or rolls back on a RuntimeException) after.
  */
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class TaskService {
 
-  private final TaskDao tasks;
-  private final CategoryCatalog categories;   // S38: the application-scoped cache (38.06)
-  private final UserDao users;
-  private final CommentDao comments;
+  /** Tasks per page in the JSP list. */
+  public static final int PAGE_SIZE = 10;
+
+  private final TaskRepository tasks;
+  private final TaskAccess access;
+  private final CategoryService categories;
+  private final UserRepository users;
+  private final ProjectRepository projects;
+  private final ProjectMemberRepository members;
+  private final CommentRepository comments;
+  private final SubtaskRepository subtasks;
+  private final LabelRepository labels;
+  private final TimeEntryRepository timeEntries;
+  private final ApplicationEventPublisher events;
   private final Clock clock;
 
-  public TaskService(TaskDao tasks, CategoryCatalog categories, UserDao users, CommentDao comments, Clock clock) {
-    this.tasks = tasks;
-    this.categories = categories;
-    this.users = users;
-    this.comments = comments;
-    this.clock = clock;
-  }
-
-  /** "Today" for overdue checks: one clock for the whole application (S44: per user timezone). */
+  /** "Today" for overdue checks: one clock for the whole application. */
   public LocalDate today() {
     return LocalDate.now(clock);
   }
 
-  public List<Task> find(TaskFilter filter, AuthUser caller) {
-    return tasks.find(filter.withOwner(ownerScope(caller)));
+  // ── Lists ─────────────────────────────────────────────────────────────────────────────────────────────────
+
+  public List<Task> find(TaskQuery query, AuthUser caller) {
+    return tasks.findAll(scoped(query, caller), query.sort().toSort(query.descending()));
   }
 
-  /** S44 (44.04): tasks per page in the list. */
-  public static final int PAGE_SIZE = 10;
-
-  /** S46: page 
-umber (1-based) of size tasks, NOT clamped: past the end there are simply no items (the API contract). */
-  public Page<Task> pageAt(TaskFilter filter, int number, int size, AuthUser caller) {
-    TaskFilter scoped = filter.withOwner(ownerScope(caller));
-    long total = tasks.count(scoped);
-    long offset = (long) (number - 1) * size;
-    List<Task> items = offset >= total ? List.of() : tasks.find(scoped, (int) offset, size);
-    return new Page<>(items, number, size, total);
+  /** The API's paging: page is 0-based and NOT clamped (past the end there are simply no items). */
+  public Page<Task> pageAt(TaskQuery query, int page, int size, AuthUser caller) {
+    return tasks.findAll(scoped(query, caller), PageRequest.of(page, size, query.sort().toSort(query.descending())));
   }
 
-  /** S44: one page of the list; a page number out of range becomes the nearest valid one. */
-  public Page<Task> page(TaskFilter filter, int requestedPage, AuthUser caller) {
-    TaskFilter scoped = filter.withOwner(ownerScope(caller));
-    long total = tasks.count(scoped);
-    int number = Page.clamp(requestedPage, total, PAGE_SIZE);
-    return new Page<>(tasks.find(scoped, (number - 1) * PAGE_SIZE, PAGE_SIZE), number, PAGE_SIZE, total);
+  /** The JSP list's paging: 1-based, and a page number out of range becomes the nearest valid one. */
+  public PageView<Task> page(TaskQuery query, int requestedPage, AuthUser caller) {
+    Specification<Task> spec = scoped(query, caller);
+    int number = PageView.clamp(requestedPage, tasks.count(spec), PAGE_SIZE);
+    return PageView.of(tasks.findAll(spec, PageRequest.of(number - 1, PAGE_SIZE, query.sort().toSort(query.descending()))));
   }
 
-  /** S39: not done and due before today (the dashboard). */
+  /** Not done and due before today (the dashboard). */
   public List<Task> overdue(AuthUser caller) {
-    LocalDate today = today();
-    return byDueDate(caller).stream().filter(task -> task.isOverdue(today)).toList();
+    return tasks.findAll(access.visible(caller).and(openAndDue(null, today().minusDays(1))), Sort.by("dueDate", "id"));
   }
 
-  /** S39: not done and due between today and today + days (the dashboard). */
+  /** Not done and due between today and today + days (the dashboard). */
   public List<Task> dueWithin(int days, AuthUser caller) {
-    LocalDate today = today();
-    LocalDate last = today.plusDays(days);
-    return byDueDate(caller).stream()
-        .filter(task -> !task.isDone() && task.getDueDate() != null
-            && !task.getDueDate().isBefore(today) && !task.getDueDate().isAfter(last))
-        .toList();
+    return tasks.findAll(access.visible(caller).and(openAndDue(today(), today().plusDays(days))), Sort.by("dueDate", "id"));
   }
 
-  /** Counts per status, keyed by the status NAME, every status present (34.20: the view reads ${stats['DONE']}). */
-  public Map<String, Integer> countByStatus(AuthUser caller) {
-    Map<String, Integer> stats = new LinkedHashMap<>();
-    tasks.countByStatus(ownerScope(caller)).forEach((status, count) -> stats.put(status.name(), count));
-    return stats;
-  }
-
-  /** S46: counts per priority, every priority present (the API's /api/stats). */
-  public Map<String, Integer> countByPriority(AuthUser caller) {
-    Map<String, Integer> counts = new LinkedHashMap<>();
-    tasks.countByPriority(ownerScope(caller)).forEach((priority, count) -> counts.put(priority.name(), count));
+  /** Counts per status, keyed by the status NAME, every status present (the JSP reads ${stats['DONE']}). */
+  public Map<String, Long> countByStatus(AuthUser caller) {
+    Map<String, Long> counts = new LinkedHashMap<>();
+    for (TaskStatus status : TaskStatus.values()) {
+      counts.put(status.name(), tasks.count(access.visible(caller).and(hasStatus(status))));
+    }
     return counts;
   }
 
+  public Map<String, Long> countByPriority(AuthUser caller) {
+    Map<String, Long> counts = new LinkedHashMap<>();
+    for (Priority priority : Priority.values()) {
+      counts.put(priority.name(), tasks.count(access.visible(caller).and(hasPriority(priority))));
+    }
+    return counts;
+  }
+
+  public Optional<Long> latestId(AuthUser caller) {
+    return tasks.findAll(access.visible(caller), PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "id")))
+        .stream().findFirst().map(Task::getId);
+  }
+
   public List<Category> categories() {
-    return categories.all();
+    return categories.list();
   }
 
-  /** The details page's view model, or empty if there's no such task. */
-  public Optional<TaskDetails> details(long id, AuthUser caller) {
-    return visible(id, caller).map(task -> new TaskDetails(
-        task,
-        task.getCategoryId() == null ? null : categories.byId(task.getCategoryId()).orElse(null),
-        users.findById(task.getOwnerId()).orElse(null),
-        comments.findByTask(id)));
-  }
-
-  /** The ids of the existing categories (a form's category must be one of them, 37.04). */
   public Set<Long> categoryIds() {
     return categories.ids();
   }
 
+  // ── One task ──────────────────────────────────────────────────────────────────────────────────────────────
+
+  /** Empty if there's no such task; ForbiddenException if it exists but the caller may not see it. */
   public Optional<Task> task(long id, AuthUser caller) {
-    return visible(id, caller);
-  }
-
-  /** For /debug/stats only (loopback, no user): NO access check. Never call it from a user-facing controller. */
-  public Optional<Task> taskForDiagnostics(long id) {
-    return tasks.findById(id);
-  }
-
-  /** DuplicateKeyException if the owner already has a task with this title. The owner is set by the controller. */
-  public Task create(Task task) {
-    return tasks.insert(task);
-  }
-
-  /**
-   * Saves an edited task. False if it no longer exists. DuplicateKeyException: title already used (S37).
-   * S42: checked against the STORED row, not the object passed in: its ownerId could have been changed by the caller.
-   */
-  public boolean update(Task task, AuthUser caller) {
-    Optional<Task> stored = visible(task.getId(), caller);
-    if (stored.isEmpty()) return false;
-    task.setOwnerId(stored.get().getOwnerId());   // an edit never changes the owner (42.08)
-    return tasks.update(task);
-  }
-
-  /** DONE ↔ TODO. False if there's no such task. */
-  public boolean toggle(long id, AuthUser caller) {
-    Optional<Task> found = visible(id, caller);
-    if (found.isEmpty()) return false;
-    return tasks.updateStatus(id, found.get().isDone() ? TaskStatus.TODO : TaskStatus.DONE);
-  }
-
-  public boolean delete(long id, AuthUser caller) {
-    return visible(id, caller).isPresent() && tasks.delete(id);
-  }
-
-  public OptionalLong latestId(AuthUser caller) {
-    return tasks.latestId(ownerScope(caller));
-  }
-
-  /** False if the task doesn't exist. The body is stored as typed (35.15). The author is the caller. */
-  public boolean addComment(long taskId, AuthUser caller, String body) {
-    return comment(taskId, caller, body).isPresent();
-  }
-
-  /** S46: the same, returning the stored comment (the API answers 201 with it). Empty if the task doesn't exist. */
-  public Optional<Comment> comment(long taskId, AuthUser caller, String body) {
-    if (visible(taskId, caller).isEmpty()) return Optional.empty();
-    Comment comment = new Comment();
-    comment.setTaskId(taskId);
-    comment.setAuthorId(caller.getId());
-    comment.setBody(body);
-    return Optional.of(comments.insert(comment));
-  }
-
-  /** S46: a task's comments, oldest first; empty Optional if there's no such task. */
-  public Optional<List<CommentDetails>> comments(long taskId, AuthUser caller) {
-    return visible(taskId, caller).map(task -> comments.findByTask(taskId));
-  }
-
-  // ---- the access rule (S42): these two methods, and nowhere else ----
-
-  /** Empty if there's no such task; AccessDeniedException if it exists but isn't the caller's (and they aren't an admin). */
-  private Optional<Task> visible(long id, AuthUser caller) {
     Optional<Task> task = tasks.findById(id);
-    if (task.isPresent() && !caller.isAdmin() && task.get().getOwnerId() != caller.getId()) {
-      throw new AccessDeniedException("task " + id);
-    }
+    if (task.isPresent() && !access.canView(task.get(), caller)) throw new ForbiddenException("view task " + id);
     return task;
   }
 
-  /** The owner a list or count is restricted to: null (everyone) for admins, the caller's own id otherwise. */
-  private static Long ownerScope(AuthUser caller) {
-    return caller.isAdmin() ? null : caller.getId();
+  /** For the other task-related services (comments, subtasks, time): the task, or an exception. */
+  public Task requireVisible(long id, AuthUser caller) {
+    return task(id, caller).orElseThrow(() -> new NotFoundException("Task not found"));
   }
 
-  private List<Task> byDueDate(AuthUser caller) {
-    return tasks.find(new TaskFilter(null, null, null, TaskSort.DUE, ownerScope(caller)));
+  public Task requireEditable(long id, AuthUser caller) {
+    Task task = requireVisible(id, caller);
+    if (!access.canEdit(task, caller)) throw ForbiddenException.insufficientRole("edit task " + id);
+    return task;
+  }
+
+  /** The details page's view model, or empty if there's no such task. */
+  public Optional<TaskDetails> details(long id, AuthUser caller) {
+    return task(id, caller).map(task -> TaskDetails.builder()
+        .task(task)
+        .category(categories.byId(task.getCategoryId()).orElse(null))
+        .project(task.getProjectId() == null ? null : projects.findById(task.getProjectId()).orElse(null))
+        .owner(users.findById(task.getOwnerId()).orElse(null))
+        .assignee(task.getAssigneeId() == null ? null : users.findById(task.getAssigneeId()).orElse(null))
+        .comments(comments.findDetailsByTask(id))
+        .subtasks(subtasks.findByTaskIdOrderByPositionAscIdAsc(id))
+        .labels(labels.findAllById(task.getLabelIds()))
+        .trackedMinutes(timeEntries.findByTaskIdOrderByStartedAtDesc(id).stream()
+            .mapToLong(entry -> entry.minutes(clock.instant())).sum())
+        .canEdit(access.canEdit(task, caller))
+        .canDelete(access.canDelete(task, caller))
+        .build());
+  }
+
+  // ── Changes ───────────────────────────────────────────────────────────────────────────────────────────────
+
+  /** The owner is the caller, always: never taken from the request (mass assignment). DuplicateException: title taken. */
+  @Transactional
+  public Task create(Task task, AuthUser caller) {
+    task.setOwnerId(caller.getId());
+    checkPlacement(task, caller);
+    task.syncCompletion(clock.instant());
+    Task saved = save(task);
+    TaskRef ref = TaskRef.of(saved);
+    events.publishEvent(new TaskEvents.Created(ref, caller.getId()));
+    if (saved.getAssigneeId() != null) events.publishEvent(new TaskEvents.Assigned(ref, caller.getId(), null));
+    return saved;
+  }
+
+  /**
+   * Applies `changes` to the STORED task inside one transaction. Empty if the task doesn't exist.
+   * The callback gets the managed entity: the JSP form's applyTo, the API's TaskInput.applyTo, or a one-liner (toggle).
+   * The owner can't change (the column is updatable = false, and nothing exposes a setter path to it from a request).
+   */
+  @Transactional
+  public Optional<Task> update(long id, AuthUser caller, Consumer<Task> changes) {
+    Optional<Task> found = tasks.findById(id);
+    if (found.isEmpty()) return Optional.empty();
+    Task task = found.get();
+    if (!access.canView(task, caller)) throw new ForbiddenException("view task " + id);
+    if (!access.canEdit(task, caller)) throw ForbiddenException.insufficientRole("edit task " + id);
+
+    TaskStatus statusBefore = task.getStatus();
+    Long assigneeBefore = task.getAssigneeId();
+    Long projectBefore = task.getProjectId();
+    changes.accept(task);
+    if (!Objects.equals(projectBefore, task.getProjectId()) || !Objects.equals(assigneeBefore, task.getAssigneeId())) {
+      checkPlacement(task, caller);
+    }
+    task.syncCompletion(clock.instant());
+    Task saved = save(task);
+
+    TaskRef ref = TaskRef.of(saved);
+    events.publishEvent(new TaskEvents.Updated(ref, caller.getId()));
+    if (statusBefore != saved.getStatus()) {
+      events.publishEvent(new TaskEvents.StatusChanged(ref, caller.getId(), statusBefore, saved.getStatus()));
+    }
+    if (!Objects.equals(assigneeBefore, saved.getAssigneeId()) && saved.getAssigneeId() != null) {
+      events.publishEvent(new TaskEvents.Assigned(ref, caller.getId(), assigneeBefore));
+    }
+    return Optional.of(saved);
+  }
+
+  /** DONE ↔ TODO. Empty if there's no such task. */
+  @Transactional
+  public Optional<Task> toggle(long id, AuthUser caller) {
+    return update(id, caller, task -> task.setStatus(task.isDone() ? TaskStatus.TODO : TaskStatus.DONE));
+  }
+
+  /** Replaces the task's labels. Every id must be an existing label. */
+  @Transactional
+  public Optional<Task> setLabels(long id, AuthUser caller, Set<Long> labelIds) {
+    if (labels.findAllById(labelIds).size() != labelIds.size()) throw FieldValidationException.of("labelIds", "unknown label");
+    return update(id, caller, task -> task.replaceLabels(labelIds));
+  }
+
+  @Transactional
+  public boolean delete(long id, AuthUser caller) {
+    Optional<Task> found = tasks.findById(id);
+    if (found.isEmpty()) return false;
+    Task task = found.get();
+    if (!access.canView(task, caller)) throw new ForbiddenException("view task " + id);
+    if (!access.canDelete(task, caller)) throw ForbiddenException.insufficientRole("delete task " + id);
+    TaskRef ref = TaskRef.of(task);
+    tasks.delete(task);                            // comments, subtasks, labels, time: ON DELETE CASCADE
+    events.publishEvent(new TaskEvents.Deleted(ref, caller.getId()));
+    return true;
+  }
+
+  // ── Rules ─────────────────────────────────────────────────────────────────────────────────────────────────
+
+  private Specification<Task> scoped(TaskQuery query, AuthUser caller) {
+    return access.visible(caller).and(matching(query));
+  }
+
+  /** saveAndFlush: the INSERT/UPDATE runs NOW, so a UNIQUE violation surfaces here, not at commit. */
+  private Task save(Task task) {
+    try {
+      return tasks.saveAndFlush(task);
+    } catch (DataIntegrityViolationException e) {
+      throw new DuplicateException("title", "you already have a task with this title");
+    }
+  }
+
+  /**
+   * Where a task may live and who may do it:
+   *   projectId   a project the caller may add tasks to (MEMBER or more), not archived
+   *   assigneeId  in a project: a member who can edit (MEMBER or more); outside a project: only the owner
+   */
+  private void checkPlacement(Task task, AuthUser caller) {
+    Map<String, String> errors = new LinkedHashMap<>();
+    Long projectId = task.getProjectId();
+    if (projectId != null) {
+      Optional<Project> project = projects.findById(projectId);
+      boolean member = caller.isAdmin()
+          || members.findRole(projectId, caller.getId()).filter(r -> r.atLeast(ProjectRole.MEMBER)).isPresent();
+      if (project.isEmpty() || !member) errors.put("projectId", "unknown project, or you can't add tasks to it");
+      else if (project.get().isArchived()) errors.put("projectId", "the project is archived");
+    }
+    Long assigneeId = task.getAssigneeId();
+    if (assigneeId != null) {
+      if (projectId == null) {
+        if (assigneeId != task.getOwnerId()) errors.put("assigneeId", "a task outside a project can only be assigned to its owner");
+      } else if (members.findRole(projectId, assigneeId).filter(r -> r.atLeast(ProjectRole.MEMBER)).isEmpty()) {
+        errors.put("assigneeId", "must be a member of the task's project");
+      }
+    }
+    if (!errors.isEmpty()) throw new FieldValidationException(errors);
   }
 }

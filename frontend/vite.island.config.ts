@@ -17,6 +17,7 @@ export default mergeConfig(
         input: {
           boardIsland: 'src/island/boardIsland.tsx',
           commentsIsland: 'src/island/commentsIsland.tsx',
+          reportsIsland: 'src/island/reportsIsland.tsx',   // the classic-Redux reports module, in /admin/reports
         },
       },
     },

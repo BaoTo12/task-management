@@ -6,7 +6,7 @@
   Data in: the request attribute "errors" (Map field → message) and the parameter "title" (${param.title}).
 --%>
 <%@ page pageEncoding="UTF-8" session="false" trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:if test="${not empty errors}">
       <div class="form-errors" role="alert">
         <p class="form-errors__title"><c:out value="${empty param.title ? 'Please fix the following:' : param.title}"/></p>

@@ -4,11 +4,11 @@
   `of` is a com.taskflow.service.Page (number, totalPages, hasPrevious, hasNext, total).
 --%>
 <%@ tag description="Pagination for a Page" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
-<%@ attribute name="of" required="true" type="com.taskflow.service.Page" %>
+<%@ attribute name="of" required="true" type="com.taskflow.dto.view.PageView" %>
 <%@ attribute name="path" required="true" %>
 <%@ attribute name="keep" required="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <c:if test="${of.totalPages > 1}">
   <nav class="pagination" aria-label="<fmt:message key='pagination.label'/>">

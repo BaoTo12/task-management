@@ -1,154 +1,195 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  TaskFlow Admin + JSON API: ONE WAR for Tomcat 9 (Servlet 4.0 / JSP 2.3 / EL 3.0, javax.*). PROVIDED plumbing (28.05).
-  The rule for every dependency below: does Tomcat already have it?  yes → scope "provided" · no → bundle it (compile).
+  TaskFlow backend: ONE Spring Boot 3 application that serves
+    - the Admin Portal: Spring MVC @Controllers rendering JSP views (JSTL, tag files, custom tags), and
+    - the JSON API for the React app: Spring MVC @RestControllers under /api.
+  Spring Boot 3 = Spring Framework 6 = Jakarta EE 10: every javax.* import of the servlet era is now jakarta.*.
+
+  Packaging is WAR on purpose: JSPs need a servlet container that can COMPILE them (Jasper), and Spring Boot only
+  supports JSP in a WAR. The same file runs two ways:
+    java -jar target/taskflow.war            embedded Tomcat 10.1 (the "provided" jars travel in WEB-INF/lib-provided)
+    drop taskflow.war into Tomcat 10.1       a classic deployment (ServletInitializer is the entry point)
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- The parent pins compatible versions of every Spring, Hibernate, Jackson, Tomcat, Flyway, Testcontainers jar. -->
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.6</version>
+    <relativePath/>
+  </parent>
+
   <groupId>com.taskflow</groupId>
   <artifactId>taskflow-backend</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
+  <name>TaskFlow backend</name>
 
   <properties>
-    <!-- Compile FOR Java 17 whatever JDK runs Maven (checks the API too, unlike -source/-target). -->
-    <maven.compiler.release>17</maven.compiler.release>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>5.10.2</junit.version>
+    <java.version>17</java.version>
   </properties>
 
   <dependencies>
-    <!-- ── Tomcat 9 ships these: compile against them, never bundle them ("provided") ─────────────── -->
+    <!-- ── Web: Spring MVC (controllers, REST, JSON via Jackson) on embedded Tomcat ──────────────────── -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>4.0.1</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>   <!-- Bean Validation: @Valid, @NotBlank, @Size -->
+    </dependency>
+    <!-- Tomcat is "provided": a standalone Tomcat already has it; java -jar finds it in WEB-INF/lib-provided. -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- Jasper: the JSP compiler. Embedded Tomcat doesn't include it; a standalone Tomcat does (so: provided). -->
     <dependency>
-      <groupId>javax.servlet.jsp</groupId>
-      <artifactId>javax.servlet.jsp-api</artifactId>
-      <version>2.3.3</version>
-      <scope>provided</scope>
-    </dependency>
-    <!--
-      No javax.el-api here (S32): our code never imports javax.el, and that API jar's ExpressionFactory looks for
-      GlassFish's implementation (com.sun.el…), which breaks EL in the embedded Tomcat tests. Tomcat ships its own.
-    -->
-
-    <!-- ── Tomcat 9 does NOT ship JSTL: bundle it in WEB-INF/lib (28.05) ──────────────────────────── -->
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>jstl</artifactId>
-      <version>1.2</version>
-    </dependency>
-
-    <!-- ── Application libraries (bundled) ────────────────────────────────────────────────────────── -->
-    <dependency> <!-- MySQL JDBC driver (S36) -->
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>8.4.0</version>
-    </dependency>
-    <dependency> <!-- connection pool behind DataSourceProvider (S36) -->
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>5.1.0</version>
-    </dependency>
-    <dependency> <!-- password hashing behind PasswordHasher (S41); also verifies the seed data (SeedDataTest) -->
-      <groupId>org.mindrot</groupId>
-      <artifactId>jbcrypt</artifactId>
-      <version>0.4</version>
-    </dependency>
-    <dependency> <!-- JSON for the API servlets (Part 3) -->
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.17.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.17.2</version>
-    </dependency>
-    <dependency> <!-- logging: SLF4J API + Logback (S43) -->
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.5.6</version>
-    </dependency>
-    <!--
-      Pinned on purpose (28.05): HikariCP 5.1.0 brings slf4j-api 1.7.36 and Logback 1.5 brings 2.0.x, both at depth 2.
-      Maven's rule is "nearest wins, then FIRST DECLARED", so HikariCP's old 1.7.36 would win, and SLF4J 1.7 can't
-      find Logback 1.5 ("No SLF4J providers were found"): all logs silently vanish. A direct dependency is nearest.
-    -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>2.0.13</version>
-    </dependency>
-
-    <!-- S36 · PROVIDED data layer: JPA (javax.persistence 2.2) implemented by Hibernate 5.6, the last line on javax.* -->
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-core</artifactId>
-      <version>5.6.15.Final</version>
-    </dependency>
-
-    <!-- ── Tests only ─────────────────────────────────────────────────────────────────────────────── -->
-    <!-- A REAL Tomcat 9, embedded in the tests: servlets are tested over HTTP, as deployed (TomcatTest, S30). -->
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>tomcat-embed-core</artifactId>
-      <version>9.0.93</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency> <!-- Jasper: the JSP engine (S32+), so the embedded Tomcat can translate and run our JSPs -->
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-jasper</artifactId>
-      <version>9.0.93</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- JSTL 3.0 (Jakarta Standard Tag Library): no Tomcat ships it, so it's bundled. API + implementation. -->
+    <dependency>
+      <groupId>jakarta.servlet.jsp.jstl</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.web</groupId>
+      <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+    </dependency>
+
+    <!-- ── Security: authentication, sessions, CSRF, CORS, headers, method security; + JSP tags (sec:authorize) ── -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-taglibs</artifactId>
+    </dependency>
+
+    <!-- ── Data (PROVIDED layer): Spring Data JPA on Hibernate 6, MySQL, schema migrations with Flyway ─── -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>   <!-- Flyway 10+: each database's support is its own module -->
+    </dependency>
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- ── Operations: caching abstraction (the categories), health endpoint ───────────────────────── -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <!-- ── Code generation at COMPILE time: getters, constructors, loggers (no runtime dependency) ─────── -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency> <!-- @ConfigurationProperties metadata: IDE completion for taskflow.* in application.yml -->
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- ── Tests ────────────────────────────────────────────────────────────────────────────────────── -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>   <!-- JUnit 5, AssertJ, MockMvc, Mockito -->
       <scope>test</scope>
     </dependency>
-    <!-- S36: a REAL MySQL 8.4 in Docker for the tests, initialised with db/01–04 exactly like docker-compose (TestDatabase). -->
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>       <!-- csrf(), user(...), @WithMockUser for MockMvc -->
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-testcontainers</artifactId>  <!-- @ServiceConnection: a container becomes the DataSource -->
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>testcontainers-mysql</artifactId>
-      <version>2.0.5</version>
+      <artifactId>mysql</artifactId>                      <!-- a REAL MySQL 8.4 in Docker, migrated by Flyway -->
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
+      <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
   <build>
-    <!-- The WAR is named taskflow.war → Tomcat deploys it at the context path /taskflow (28.10). -->
+    <!-- taskflow.war → a standalone Tomcat deploys it at /taskflow; embedded, server.servlet.context-path does the same. -->
     <finalName>taskflow</finalName>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>3.4.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-      </plugin>
+      <!--
+        Annotation processors listed EXPLICITLY: since JDK 23, javac no longer runs processors it merely finds on the
+        classpath. Lombok writes the getters/constructors/loggers; the configuration processor writes property metadata.
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.13.0</version>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+              <version>${spring-boot.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+            <exclude>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-configuration-processor</artifactId>
+            </exclude>
+        </configuration>
       </plugin>
     </plugins>
   </build>
 
   <!--
-    S50 (50.06): OWASP Dependency-Check, only when asked (the first run downloads the NVD database, which takes long
-    and works best with a free NVD API key):
+    OWASP Dependency-Check, only when asked (the first run downloads the NVD database, which takes long and works best
+    with a free NVD API key):
       mvn -P security verify -DnvdApiKey=<your key>
     Report: target/dependency-check-report.html. The build FAILS for any dependency with a CVSS score of 7 or more.
     False positives go into dependency-check-suppressions.xml, each with a reason.

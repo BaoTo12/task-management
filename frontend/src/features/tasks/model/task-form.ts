@@ -9,6 +9,9 @@ export interface TaskFormValues {
   priority: Priority;
   /** '' means "no due date" (an empty date input), converted to null on submit. */
   dueDate: IsoDate | '';
+  /** Spring Boot backend: where the task lives and who does it (null = personal / unassigned). */
+  projectId: number | null;
+  assigneeId: number | null;
 }
 
 export type TaskFormErrors = Partial<Record<keyof TaskFormValues, string>>;
@@ -22,6 +25,8 @@ export const EMPTY_TASK_FORM: TaskFormValues = {
   status: 'TODO',
   priority: 'MEDIUM',
   dueDate: '',
+  projectId: null,
+  assigneeId: null,
 };
 
 export function toFormValues(task: Task): TaskFormValues {
@@ -31,6 +36,8 @@ export function toFormValues(task: Task): TaskFormValues {
     status: task.status,
     priority: task.priority,
     dueDate: task.dueDate ?? '',
+    projectId: task.projectId,
+    assigneeId: task.assigneeId,
   };
 }
 
@@ -76,6 +83,8 @@ export function toCreateRequest(values: TaskFormValues, categoryId: number | nul
     priority: values.priority,
     dueDate: values.dueDate === '' ? null : values.dueDate,
     categoryId,
+    projectId: values.projectId,
+    assigneeId: values.assigneeId,
   };
 }
 
@@ -84,7 +93,7 @@ export function localToday(): IsoDate {
   return new Date().toLocaleDateString('en-CA');
 }
 
-const FORM_FIELDS: readonly (keyof TaskFormValues)[] = ['title', 'description', 'status', 'priority', 'dueDate'];
+const FORM_FIELDS: readonly (keyof TaskFormValues)[] = ['title', 'description', 'status', 'priority', 'dueDate', 'projectId', 'assigneeId'];
 
 /**
  * Server field errors (a 400's `fieldErrors`, 13.07) → form errors (19.09).

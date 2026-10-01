@@ -1,0 +1,37 @@
+{
+  "title": "Notifications",
+  "bell_one": "{{count}} unread notification",
+  "bell_other": "{{count}} unread notifications",
+  "loading": "Loading…",
+  "empty": "No notifications.",
+  "unreadOnly": "Unread only",
+  "markAllRead": "Mark all as read",
+  "markRead": "Mark as read",
+  "open": "Open",
+  "more": "Load older",
+  "settings": "Pop-up settings",
+  "type": {
+    "TASK_ASSIGNED": "assigned you “{{subject}}”",
+    "TASK_STATUS_CHANGED": "changed the status of “{{subject}}”",
+    "TASK_DELETED": "deleted “{{subject}}”",
+    "COMMENT_ADDED": "commented on “{{subject}}”",
+    "PROJECT_INVITED": "added you to the project “{{subject}}”",
+    "PROJECT_REMOVED": "removed you from the project “{{subject}}”"
+  },
+  "toast": {
+    "TASK_ASSIGNED": "New task for you: {{subject}}",
+    "TASK_STATUS_CHANGED": "Status changed: {{subject}}",
+    "TASK_DELETED": "Task deleted: {{subject}}",
+    "COMMENT_ADDED": "New comment on {{subject}}",
+    "PROJECT_INVITED": "You joined {{subject}}",
+    "PROJECT_REMOVED": "You left {{subject}}"
+  },
+  "toastFor": {
+    "TASK_ASSIGNED": "Assignments",
+    "TASK_STATUS_CHANGED": "Status changes",
+    "TASK_DELETED": "Deleted tasks",
+    "COMMENT_ADDED": "Comments",
+    "PROJECT_INVITED": "Project invitations",
+    "PROJECT_REMOVED": "Project removals"
+  }
+}

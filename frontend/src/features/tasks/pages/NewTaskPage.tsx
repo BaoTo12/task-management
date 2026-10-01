@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { fieldErrorsOf } from '@/shared/api/api-error';
 import { useAddTaskMutation } from '@/shared/api/apiSlice';
@@ -18,6 +19,10 @@ export function NewTaskPage() {
   const { t } = useTranslation('tasks');
   const { show } = useToast();
   const navigate = useNavigate();
+  // /tasks/new?projectId=1 (the project page's "New task" link) starts the form inside that project.
+  const [searchParams] = useSearchParams();
+  const presetProject = Number(searchParams.get('projectId')) || null;
+  const initialValues = useMemo<TaskFormValues>(() => ({ ...EMPTY_TASK_FORM, projectId: presetProject }), [presetProject]);
 
   async function handleSubmit(values: TaskFormValues) {
     try {
@@ -38,7 +43,7 @@ export function NewTaskPage() {
     <>
       <Breadcrumbs label={t('common:breadcrumb.label')} items={[{ label: t('title'), to: '/tasks' }, { label: t('form.newTitle') }]} />
       <h1 className="page__title">{t('form.newTitle')}</h1>
-      <TaskForm mode="create" initialValues={EMPTY_TASK_FORM} onSubmit={handleSubmit} onCancel={() => navigate(-1)} />
+      <TaskForm mode="create" initialValues={initialValues} onSubmit={handleSubmit} onCancel={() => navigate(-1)} />
     </>
   );
 }

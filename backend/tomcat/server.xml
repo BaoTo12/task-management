@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  S43 (43.10) · PROVIDED. Tomcat 9's server.xml for TaskFlow, mounted by docker-compose.yml over the image's own
+  S43 (43.10) · PROVIDED. Tomcat 10.1 server.xml for TaskFlow, mounted by docker-compose.yml over the image's own
   (/usr/local/tomcat/conf/server.xml). The default file, trimmed, with ONE change that matters for security:
   the ErrorReportValve. It renders the error page for anything the web app doesn't handle (another context, a
   failing error page, a request Tomcat rejects before any web app runs). By default it prints the exception,
-  its stack trace and "Apache Tomcat/9.0.x". Here: only the status.
+  its stack trace and "Apache Tomcat/10.1.x". Here: only the status.
 -->
 <Server port="8005" shutdown="SHUTDOWN">
   <Listener className="org.apache.catalina.startup.VersionLoggerListener"/>

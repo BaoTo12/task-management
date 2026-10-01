@@ -7,7 +7,7 @@
 --%>
 <%@ tag description="TaskFlow Admin page layout" pageEncoding="UTF-8" trimDirectiveWhitespaces="true" %>
 <%@ attribute name="title" required="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <c:set var="pageTitle" value="${title}"/>
 <%@ include file="/WEB-INF/views/common/header.jspf" %>
 <jsp:doBody/>

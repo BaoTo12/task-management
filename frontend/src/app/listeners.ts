@@ -5,6 +5,8 @@ import type { TypedStartListening } from '@reduxjs/toolkit';
 
 import { addAuthListeners } from '@/features/auth';
 import { addListPrefsCookieListener } from '@/features/listPrefs';
+import { addNotificationListeners } from '@/features/notifications';
+import { addPeopleListeners } from '@/features/people';
 import { addQuickFindListener } from '@/features/search';
 import { addTaskListeners } from '@/features/tasks';
 
@@ -26,5 +28,7 @@ export function createAppListenerMiddleware(extra: ThunkExtra) {
   addQuickFindListener(startAppListening);
   addAuthListeners(startAppListening); // 24.13
   addListPrefsCookieListener(startAppListening); // 24.06
+  addPeopleListeners(startAppListening); // debounced: fetch the people any response mentions
+  addNotificationListeners(startAppListening); // live notifications → toasts + cache invalidation
   return listenerMiddleware;
 }

@@ -1,17 +1,19 @@
 package com.taskflow.security;
 
+import com.taskflow.config.TaskflowProperties;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Component;
 
 /**
- * S41 (41.15): slows down password guessing. Failed logins are counted per ACCOUNT and per client IP, in a time
- * window; over the limit, logins are refused (even with the right password) until the window ends.
- * In memory, application-wide, thread-safe (38.04): ConcurrentHashMap.compute is atomic per key.
- * Limits of this design: per server (a cluster needs a shared store), lost on restart, and the map grows with the
- * number of distinct keys (expired windows are dropped when touched).
+ * Slows down password guessing. Failed logins are counted per ACCOUNT and per client IP, in a time window; over the
+ * limit, logins are refused (even with the right password) until the window ends.
+ * A singleton shared by every request thread: ConcurrentHashMap.compute is atomic per key.
+ * Limits of this design: per server (a cluster needs a shared store such as Redis), lost on restart.
  */
+@Component
 public class LoginThrottle {
 
   private record Window(int failures, Instant start) {}
@@ -22,10 +24,10 @@ public class LoginThrottle {
   private final Clock clock;
   private final ConcurrentHashMap<String, Window> windows = new ConcurrentHashMap<>();
 
-  public LoginThrottle(int maxPerAccount, int maxPerIp, Duration period, Clock clock) {
-    this.maxPerAccount = maxPerAccount;
-    this.maxPerIp = maxPerIp;
-    this.period = period;
+  public LoginThrottle(TaskflowProperties properties, Clock clock) {
+    this.maxPerAccount = properties.loginThrottle().maxPerAccount();
+    this.maxPerIp = properties.loginThrottle().maxPerIp();
+    this.period = properties.loginThrottle().period();
     this.clock = clock;
   }
 

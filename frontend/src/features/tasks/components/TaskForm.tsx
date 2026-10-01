@@ -10,6 +10,7 @@ import { FormField } from '@/shared/ui/forms/FormField';
 import { SelectField } from '@/shared/ui/forms/SelectField';
 
 import { DESCRIPTION_MAX, hasErrors, localToday, TITLE_MAX, validateTaskForm } from '../model/task-form';
+import { TaskPlacementFields } from './TaskPlacementFields';
 import type { TaskFormErrors, TaskFormValues } from '../model/task-form';
 import { initTaskForm, isTaskFormDirty, taskFormReducer, visibleError } from '../model/task-form-reducer';
 
@@ -126,6 +127,18 @@ export function TaskForm({ initialValues, mode, onSubmit, onCancel }: TaskFormPr
           />
         )}
       </FormField>
+
+      <TaskPlacementFields
+        projectId={values.projectId}
+        assigneeId={values.assigneeId}
+        projectError={errorOf('projectId')}
+        assigneeError={errorOf('assigneeId')}
+        onProjectChange={(projectId) => {
+          dispatch({ type: 'fieldChanged', field: 'projectId', value: projectId });
+          dispatch({ type: 'fieldChanged', field: 'assigneeId', value: null }); // members differ per project
+        }}
+        onAssigneeChange={(assigneeId) => dispatch({ type: 'fieldChanged', field: 'assigneeId', value: assigneeId })}
+      />
 
       <div className="form__actions">
         <Button type="submit" variant="primary" disabled={submitting}>

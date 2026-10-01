@@ -9,8 +9,8 @@
 <%@ attribute name="keep" required="true" %>
 <%@ attribute name="number" required="true" type="java.lang.Integer" %>
 <%@ attribute name="current" type="java.lang.Boolean" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <c:url var="href" value="${path}">
   <c:forEach items="${fn:split(keep, ',')}" var="name">
     <c:if test="${not empty param[name]}"><c:param name="${name}" value="${param[name]}"/></c:if>

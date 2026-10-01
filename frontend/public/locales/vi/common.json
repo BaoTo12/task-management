@@ -8,7 +8,10 @@
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
     "settings": "Cài đặt",
-    "skip": "Bỏ qua đến nội dung"
+    "skip": "Bỏ qua đến nội dung",
+    "projects": "Dự án",
+    "reports": "Báo cáo",
+    "notifications": "Thông báo"
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -100,5 +103,10 @@
     "saving": "Đang lưu…",
     "saved": "Đã lưu cài đặt."
   },
-  "cannotUndo": "Không thể hoàn tác."
+  "cannotUndo": "Không thể hoàn tác.",
+  "people": {
+    "nobody": "Không ai",
+    "unknown": "Người dùng #{{id}}",
+    "noMatch": "Không tìm thấy ai."
+  }
 }

@@ -4,8 +4,11 @@ import { Outlet, useLocation, useNavigate } from 'react-router';
 import styled from 'styled-components';
 
 import { useAuth } from '@/features/auth';
+import { useGetProjectsQuery } from '@/features/projects';
+import { NotificationBell } from '@/features/notifications';
 import { QuickFind } from '@/features/search';
 import { LIST_QUERY, OpenTasksBadge } from '@/features/tasks';
+import { TimerWidget } from '@/features/timeTracking';
 
 import { useGetCategoriesQuery, useGetTasksQuery } from '@/shared/api/apiSlice';
 import { LanguageSwitcher } from '@/shared/i18n/LanguageSwitcher';
@@ -39,6 +42,7 @@ export function AppLayout() {
   // S24: only with a session. Anonymous requests would answer 401 → sessionExpired (24.13).
   useGetTasksQuery(user ? LIST_QUERY : skipToken);
   useGetCategoriesQuery(user ? undefined : skipToken);
+  useGetProjectsQuery(user ? undefined : skipToken); // project names and MY role, read by many screens' selectors
 
   async function handleLogout() {
     await logout(); // the server session ends, then slices, cache and user cookies are cleared (24.12)
@@ -56,11 +60,15 @@ export function AppLayout() {
         <nav className="page__nav" aria-label={t('nav.main')}>
           <NavItem to="/tasks">{t('nav.tasks')}</NavItem>
           <NavItem to="/dashboard">{t('nav.dashboard')}</NavItem>
+          {user && <NavItem to="/projects">{t('nav.projects')}</NavItem>}
+          {user && <NavItem to="/reports">{t('nav.reports')}</NavItem>}
           {user && <NavItem to="/settings">{t('nav.settings')}</NavItem>}
         </nav>
         <HeaderActions>
           {user && <QuickFind />}
           {user && <OpenTasksBadge />}
+          {user && <TimerWidget />}
+          {user && <NotificationBell />}
           <LanguageSwitcher />
           <ThemeToggle />
           {user ? (

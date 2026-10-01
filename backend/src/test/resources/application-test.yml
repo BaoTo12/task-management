@@ -1,0 +1,10 @@
+# Profile "test" (IntegrationTest: @ActiveProfiles("test")). The DataSource comes from the MySQL container
+# (@ServiceConnection); Flyway logs in as taskflow_migrator, created inside the container by db/01-database-and-users.sql.
+logging:
+  level:
+    com.taskflow: INFO
+    org.springframework.security: WARN
+taskflow:
+  login-throttle:
+    max-per-account: 50      # tests log in wrongly on purpose; don't let the throttle block the next test
+    max-per-ip: 200

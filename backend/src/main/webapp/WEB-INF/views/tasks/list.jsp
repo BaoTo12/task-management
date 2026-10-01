@@ -9,9 +9,9 @@
   sortable column headers (44.16), and an EL function from our own TLD (44.14).
 --%>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="tf" uri="urn:taskflow:tags" %>
 <fmt:message key="tasks.title" var="listTitle"/>
@@ -22,7 +22,7 @@
     <%-- S45 file upload (TaskImportServlet): enctype=multipart/form-data is what makes the browser send the FILE, not just
          its name. The CSRF token is an ordinary field of the multipart body. --%>
     <form class="import inline-form" method="post" action="<c:url value='/tasks/import'/>" enctype="multipart/form-data">
-      <input type="hidden" name="_csrf" value="${csrfToken}">
+      <input type="hidden" name="_csrf" value="${_csrf.token}">
       <label><fmt:message key="import.label"/> <input type="file" name="file" accept=".csv,text/csv" required></label>
       <button class="btn btn--sm btn--secondary" type="submit"><fmt:message key="import.submit"/></button>
       <span class="text-muted"><fmt:message key="import.help"/></span>

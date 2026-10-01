@@ -1,45 +1,44 @@
 <%--
-  S39 (39.08): the navigation, with the current section highlighted, and the theme switch (39.09).
-  After a FORWARD, pageContext.request.servletPath is the JSP's path (/WEB-INF/views/…): the path the USER asked
-  for is kept by the container in the request attribute javax.servlet.forward.servlet_path (39.08).
-  S44 (44.06): every text from the resource bundle (<fmt:message>), and the language switch (44.08).
-  <fmt:message> does NOT escape its parameters: the display name is escaped before it goes in (44.06).
+  The navigation, with the current section highlighted, the theme and language switches, and the user menu.
+  ${currentPath} and ${currentUrl} come from ViewGlobalsInterceptor (Spring MVC forwards to this JSP, so the path the
+  USER asked for is no longer the request's servlet path).
+  Spring Security's JSP tags (sec:): <sec:authorize access="hasRole('ADMIN')"> renders its body only for admins. It
+  only HIDES links: the URL rule in SecurityConfig and @PreAuthorize on the services are what actually protect /admin/**.
+  Every POST form carries Spring Security's CSRF token: ${_csrf.parameterName} = "_csrf", ${_csrf.token} = the value.
+  <fmt:message> does NOT escape its parameters: the display name is escaped before it goes in.
 --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="currentPath" value="${requestScope['javax.servlet.forward.servlet_path']}"/>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
     <nav class="page__nav">
       <a class="page__nav-link${currentPath == '/dashboard' ? ' is-active' : ''}" href="<c:url value='/dashboard'/>"><fmt:message key="nav.dashboard"/></a>
       <a class="page__nav-link${fn:startsWith(currentPath, '/tasks') and currentPath != '/tasks/new' ? ' is-active' : ''}" href="<c:url value='/tasks'/>"><fmt:message key="nav.tasks"/></a>
       <a class="page__nav-link${currentPath == '/react-board' ? ' is-active' : ''}" href="<c:url value='/react-board'/>"><fmt:message key="nav.board"/></a>
       <a class="page__nav-link${currentPath == '/tasks/new' ? ' is-active' : ''}" href="<c:url value='/tasks/new'/>"><fmt:message key="nav.newTask"/></a>
       <a class="page__nav-link${fn:startsWith(currentPath, '/categories') ? ' is-active' : ''}" href="<c:url value='/categories'/>"><fmt:message key="nav.categories"/></a>
-      <%-- S42 (42.06): only admins SEE the link; AuthorizationFilter is what actually protects /admin/*. --%>
-      <c:if test="${currentUser.admin}">
-        <a class="page__nav-link${fn:startsWith(currentPath, '/admin') ? ' is-active' : ''}" href="<c:url value='/admin/users'/>"><fmt:message key="nav.users"/></a>
-        <a class="page__nav-link" href="<c:url value='/admin/audit'/>"><fmt:message key="nav.audit"/></a>
-      </c:if>
-      <%-- S41 (41.19): who is logged in, and a POST logout (it changes state: CSRF-protected). --%>
-      <c:if test="${not empty currentUser}">
+      <sec:authorize access="hasRole('ADMIN')">
+        <a class="page__nav-link${fn:startsWith(currentPath, '/admin/users') ? ' is-active' : ''}" href="<c:url value='/admin/users'/>"><fmt:message key="nav.users"/></a>
+        <a class="page__nav-link${currentPath == '/admin/audit' ? ' is-active' : ''}" href="<c:url value='/admin/audit'/>"><fmt:message key="nav.audit"/></a>
+        <a class="page__nav-link${currentPath == '/admin/reports' ? ' is-active' : ''}" href="<c:url value='/admin/reports'/>"><fmt:message key="nav.reports"/></a>
+      </sec:authorize>
+      <sec:authorize access="isAuthenticated()">
         <span class="page__user"><fmt:message key="nav.loggedInAs"><fmt:param value="${fn:escapeXml(currentUser.displayName)}"/></fmt:message></span>
         <form class="inline-form" method="post" action="<c:url value='/logout'/>">
-          <input type="hidden" name="_csrf" value="${csrfToken}">
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
           <button class="btn btn--sm btn--secondary" type="submit"><fmt:message key="nav.logout"/></button>
         </form>
-      </c:if>
-      <c:if test="${not empty csrfToken}">
-        <c:set var="here" value="${requestScope['javax.servlet.forward.request_uri']}${empty requestScope['javax.servlet.forward.query_string'] ? '' : '?'}${requestScope['javax.servlet.forward.query_string']}"/>
         <form class="theme-switch inline-form" method="post" action="<c:url value='/preferences/theme'/>">
-          <input type="hidden" name="_csrf" value="${csrfToken}">
-          <input type="hidden" name="returnTo" value="${fn:escapeXml(here)}">
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+          <input type="hidden" name="returnTo" value="${fn:escapeXml(currentUrl)}">
           <button class="btn btn--sm btn--secondary" type="submit" name="theme" value="${theme == 'dark' ? 'light' : 'dark'}"><fmt:message key="${theme == 'dark' ? 'nav.theme.light' : 'nav.theme.dark'}"/></button>
         </form>
-        <%-- S44 (44.08): the other language, written to the tf_lang cookie the React app reads too. --%>
+        <%-- The other language, written to the tf_lang cookie the React app reads too. --%>
         <form class="language-switch inline-form" method="post" action="<c:url value='/preferences/language'/>">
-          <input type="hidden" name="_csrf" value="${csrfToken}">
-          <input type="hidden" name="returnTo" value="${fn:escapeXml(here)}">
+          <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+          <input type="hidden" name="returnTo" value="${fn:escapeXml(currentUrl)}">
           <button class="btn btn--sm btn--secondary" type="submit" name="lang" value="${lang == 'vi' ? 'en' : 'vi'}" lang="${lang == 'vi' ? 'en' : 'vi'}"><fmt:message key="nav.language.switchTo"/></button>
         </form>
-      </c:if>
+      </sec:authorize>
     </nav>

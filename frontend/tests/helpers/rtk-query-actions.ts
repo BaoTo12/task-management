@@ -14,3 +14,18 @@ export function mutationFulfilled<Args, Result>(endpointName: string, originalAr
     },
   };
 }
+
+/** The same for a QUERY: what `endpoint.matchFulfilled` matches when a query succeeds. */
+export function queryFulfilled<Args, Result>(endpointName: string, originalArgs: Args, payload: Result) {
+  return {
+    type: 'api/executeQuery/fulfilled' as const,
+    payload,
+    meta: {
+      arg: { type: 'query' as const, endpointName, originalArgs, queryCacheKey: `${endpointName}(${JSON.stringify(originalArgs ?? null)})` },
+      requestId: `test-${endpointName}`,
+      requestStatus: 'fulfilled' as const,
+      fulfilledTimeStamp: 0,
+      baseQueryMeta: undefined,
+    },
+  };
+}

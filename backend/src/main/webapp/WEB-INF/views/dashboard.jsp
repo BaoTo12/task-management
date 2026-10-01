@@ -1,12 +1,12 @@
 <%--
-  S39 (39.10): the dashboard: overdue tasks and tasks due in the next 7 days. DashboardServlet set overdue, dueSoon,
-  today and csrfToken. Both tables reuse task-row.jspf (the same fragment as the list), included twice in one page.
+  S39 (39.10): the dashboard: overdue tasks and tasks due in the next 7 days. DashboardController set overdue, dueSoon,
+  today, counts and completion. Both tables reuse task-row.jspf (the same fragment as the list), included twice in one page.
   S44: the layout tag and the bundle's texts, like the list.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" session="false" trimDirectiveWhitespaces="true" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <fmt:message key="dashboard.title" var="dashboardTitle"/>
 <t:layout title="${dashboardTitle}">

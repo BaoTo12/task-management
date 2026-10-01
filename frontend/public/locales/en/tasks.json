@@ -37,7 +37,9 @@
     "back": "Back to list",
     "delete": "Delete",
     "deleteConfirm": "Delete \"{{title}}\"? $t(common:cannotUndo)",
-    "priority": "Priority"
+    "priority": "Priority",
+    "project": "Project",
+    "assignee": "Assignee"
   },
   "comments": {
     "heading": "Comments",
@@ -107,7 +109,19 @@
     "saving": "Saving…",
     "reset": "Reset",
     "cancel": "Cancel",
-    "unsaved": "Unsaved changes"
+    "unsaved": "Unsaved changes",
+    "project": "Project",
+    "noProject": "No project",
+    "assignee": "Assignee",
+    "unassigned": "Unassigned",
+    "me": "Me ({{name}})"
   },
-  "continueTask": "Continue where you left off: <link>{{title}}</link>"
+  "continueTask": "Continue where you left off: <link>{{title}}</link>",
+  "filters": {
+    "project": "Project",
+    "allProjects": "All projects",
+    "label": "Label",
+    "allLabels": "All labels",
+    "mine": "Assigned to me"
+  }
 }

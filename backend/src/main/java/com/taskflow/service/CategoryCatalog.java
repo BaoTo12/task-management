@@ -1,42 +1,35 @@
 package com.taskflow.service;
 
-import com.taskflow.dao.CategoryDao;
-import com.taskflow.model.Category;
+import com.taskflow.entity.Category;
+import com.taskflow.repository.CategoryRepository;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Component;
 
 /**
- * S38 (38.06): the categories, cached for the whole application (application scope).
- * Categories are read on almost every page and change rarely: loading them once and refreshing only when they change
- * saves a query per page. Thread safety: the list is an IMMUTABLE snapshot in a volatile field; a refresh builds a new
- * list and replaces the reference in one step, so readers see either the old list or the new one, never a half-built one.
+ * The categories, CACHED for the whole application: they're read on almost every page and change rarely.
+ * Spring's cache abstraction does what the servlet era wrote by hand (a volatile immutable snapshot):
+ *   @Cacheable("categories")  the first call runs the query; later calls return the cached list without running the method
+ *   @CacheEvict               after any change, the next all() reloads
+ * Works through a PROXY around this bean: a call from INSIDE this class (this.all()) would bypass the cache. That's why
+ * the cache lives in its own small bean that CategoryService calls.
+ * The cache is in-memory (ConcurrentMapCache): one server only, like the rest of TaskFlow's in-memory state.
  */
+@Component
+@RequiredArgsConstructor
 public class CategoryCatalog {
 
-  private final CategoryDao dao;
-  private volatile List<Category> categories;
+  private final CategoryRepository categories;
 
-  public CategoryCatalog(CategoryDao dao) {
-    this.dao = dao;
-    this.categories = List.copyOf(dao.findAll()); // loaded at startup
-  }
-
+  @Cacheable("categories")
   public List<Category> all() {
-    return categories;
+    return List.copyOf(categories.findAllByOrderByNameAsc());   // immutable: callers can't change the cached list
   }
 
-  public Set<Long> ids() {
-    return categories.stream().map(Category::getId).collect(Collectors.toUnmodifiableSet());
-  }
-
-  public Optional<Category> byId(long id) {
-    return categories.stream().filter(c -> c.getId() == id).findFirst();
-  }
-
-  /** After any change to the categories table (CategoryService calls it). */
-  public void refresh() {
-    categories = List.copyOf(dao.findAll());
+  @CacheEvict(value = "categories", allEntries = true)
+  public void evict() {
+    // the annotation does the work
   }
 }

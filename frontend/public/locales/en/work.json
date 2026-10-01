@@ -1,0 +1,39 @@
+{
+  "loading": "Loading…",
+  "checklist": {
+    "title": "Checklist ({{done}}/{{total}})",
+    "progress": "{{done}} of {{total}} done",
+    "new": "New item",
+    "add": "Add",
+    "delete": "Delete item",
+    "edit": "Reorder & rename",
+    "rename": "Item title",
+    "up": "Move up",
+    "down": "Move down",
+    "undo": "Undo",
+    "redo": "Redo",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "labels": {
+    "title": "Labels",
+    "new": "New label",
+    "create": "Create"
+  },
+  "time": {
+    "title": "Tracked time: {{total}}",
+    "start": "Start timer",
+    "switch": "Track this task instead",
+    "running": "The timer is running on this task.",
+    "inProgress": "running",
+    "delete": "Delete entry",
+    "from": "From",
+    "to": "To",
+    "note": "Note",
+    "log": "Log time"
+  },
+  "timer": {
+    "stop": "Stop",
+    "task": "Task #{{id}}"
+  }
+}

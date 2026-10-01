@@ -1,6 +1,6 @@
-# S28 (28.01) · PROVIDED. The Docker option for the backend environment: MySQL 8 + Tomcat 9 (JDK 17).
+# The backend environment in Docker: MySQL 8.4 + a STANDALONE Tomcat 10.1 running taskflow.war.
 # Start:  docker compose up -d        Stop: docker compose down        Wipe the database: docker compose down -v
-# The native-install option (installers) is in 28.01; both give the same URLs and credentials.
+# The same WAR also runs on its own (embedded Tomcat): java -jar backend/target/taskflow.war
 services:
   mysql:
     image: mysql:8.4                      # MySQL 8 LTS line
@@ -11,7 +11,8 @@ services:
     ports:
       - "3306:3306"                       # so the IDE / MySQL Workbench / the app on the host can connect
     volumes:
-      # Scripts run ONCE, in name order, the first time the data volume is empty: 01 → 02 → 03 → 04.
+      # Runs ONCE, the first time the data volume is empty: the database and the two accounts. The tables come from
+      # Flyway (src/main/resources/db/migration) when the application starts.
       - ./backend/db:/docker-entrypoint-initdb.d:ro
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -20,19 +21,21 @@ services:
       retries: 20
 
   tomcat:
-    image: tomcat:9.0-jdk17-temurin       # Tomcat 9 = Servlet 4.0 / javax.* (28.02)
+    image: tomcat:10.1-jdk17-temurin      # Tomcat 10.1 = Jakarta EE 10 (Servlet 6.0, Pages 3.1): what Spring Boot 3 needs
     ports:
       - "8081:8080"                       # host 8081: 8080 is taken by the local Apache httpd
     environment:
       TZ: UTC
-      # Where S36's DataSourceProvider finds the database from inside the Docker network.
-      TASKFLOW_DB_URL: jdbc:mysql://mysql:3306/taskflow?serverTimezone=UTC
-      TASKFLOW_DB_USER: taskflow_app
-      TASKFLOW_DB_PASSWORD: taskflow_dev_pw
+      # Spring Boot reads environment variables as properties ("relaxed binding"): these override application.yml.
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/taskflow?serverTimezone=UTC&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: taskflow_app
+      SPRING_DATASOURCE_PASSWORD: taskflow_dev_pw
+      SPRING_FLYWAY_USER: taskflow_migrator
+      SPRING_FLYWAY_PASSWORD: taskflow_migrator_dev_pw
     volumes:
-      # The WAR Maven builds (mvn package) → Tomcat auto-deploys it at /taskflow (28.10). Rebuild → redeploy.
+      # The WAR Maven builds (mvn package) → Tomcat deploys it at /taskflow (the file name). Rebuild → redeploy.
       - ./backend/target/taskflow.war:/usr/local/tomcat/webapps/taskflow.war
-      # S43 (43.10): our server.xml: Tomcat's own error pages without stack traces or the server version.
+      # Our server.xml: Tomcat's own error pages without stack traces or the server version.
       - ./backend/tomcat/server.xml:/usr/local/tomcat/conf/server.xml:ro
     depends_on:
       mysql:

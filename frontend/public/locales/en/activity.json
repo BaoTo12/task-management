@@ -1,0 +1,20 @@
+{
+  "title": "Activity",
+  "empty": "Nothing happened yet.",
+  "more": "Older activity",
+  "loading": "Loading…",
+  "type": {
+    "TASK_CREATED": "created “{{subject}}”",
+    "TASK_UPDATED": "edited “{{subject}}”",
+    "TASK_STATUS_CHANGED": "moved “{{subject}}” ({{details}})",
+    "TASK_ASSIGNED": "assigned “{{subject}}”",
+    "TASK_DELETED": "deleted “{{subject}}”",
+    "COMMENT_ADDED": "commented on “{{subject}}”",
+    "SUBTASK_COMPLETED": "ticked “{{details}}” in “{{subject}}”",
+    "TIME_LOGGED": "logged {{details}} on “{{subject}}”",
+    "PROJECT_CREATED": "created the project “{{subject}}”",
+    "PROJECT_UPDATED": "updated the project “{{subject}}”",
+    "MEMBER_ADDED": "added a member to “{{subject}}” ({{details}})",
+    "MEMBER_REMOVED": "removed {{details}} from “{{subject}}”"
+  }
+}

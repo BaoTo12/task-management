@@ -34,7 +34,9 @@
     "back": "Về danh sách",
     "delete": "Xoá",
     "deleteConfirm": "Xoá \"{{title}}\"? $t(common:cannotUndo)",
-    "priority": "Độ ưu tiên"
+    "priority": "Độ ưu tiên",
+    "project": "Dự án",
+    "assignee": "Người được giao"
   },
   "comments": {
     "heading": "Bình luận",
@@ -102,7 +104,19 @@
     "saving": "Đang lưu…",
     "reset": "Đặt lại",
     "cancel": "Huỷ",
-    "unsaved": "Có thay đổi chưa lưu"
+    "unsaved": "Có thay đổi chưa lưu",
+    "project": "Dự án",
+    "noProject": "Không thuộc dự án",
+    "assignee": "Người được giao",
+    "unassigned": "Chưa giao",
+    "me": "Tôi ({{name}})"
   },
-  "continueTask": "Tiếp tục từ lần trước: <link>{{title}}</link>"
+  "continueTask": "Tiếp tục từ lần trước: <link>{{title}}</link>",
+  "filters": {
+    "project": "Dự án",
+    "allProjects": "Tất cả dự án",
+    "label": "Nhãn",
+    "allLabels": "Tất cả nhãn",
+    "mine": "Giao cho tôi"
+  }
 }

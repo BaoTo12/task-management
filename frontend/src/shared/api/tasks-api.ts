@@ -11,6 +11,9 @@ export interface TaskQuery {
   status?: TaskStatus;
   priority?: Priority;
   categoryId?: number;
+  projectId?: number;
+  assigneeId?: number;
+  labelId?: number;
   page?: number;
   size?: number;
   sort?: `${SortKey | 'id'},${SortDirection}`;

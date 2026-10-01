@@ -56,6 +56,54 @@ styled-components has its own detailed map in [STYLING.md](STYLING.md).
 | `onCacheEntryAdded` (streaming updates) + `invalidateTags` | cross-tab sync in `features/auth/api/authApi.ts`, sender in `taskListeners.ts` |
 | `usePrefetch`, `skipToken`, lazy `queryFn` | `TasksPage.tsx`, `authApi.ts` |
 
+### The full Redux checklist (team features + the legacy module)
+
+Every API of `redux`, `react-redux`, `redux-thunk`, `reselect`, Redux Toolkit and RTK Query, and where it is used for real.
+
+**Classic Redux** (`features/reports/legacy/`, with its own `MIGRATION.md`)
+
+| API | Where |
+|---|---|
+| action-type constants, hand-written action creators, a discriminated action union | `legacy/actionTypes.ts`, `legacy/actions.ts` |
+| switch reducers with spread copies, `default: return state` | `legacy/reducers.ts` |
+| `combineReducers` (redux) | `legacy/reducers.ts`, `legacy/standaloneStore.ts` |
+| `legacy_createStore` (createStore), `applyMiddleware`, `compose`, the DevTools compose | `legacy/standaloneStore.ts` (used by `island/reportsIsland.tsx`) |
+| redux-thunk directly: `ThunkAction`, `withExtraArgument`, thunks that compose and skip work | `legacy/thunks.ts`, `legacy/standaloneStore.ts` |
+| a hand-written middleware (`store => next => action`) | `actionLogger` in `standaloneStore.ts`; `features/timeTracking/state/timerMiddleware.ts` |
+| reselect directly: `createSelector`, `createStructuredSelector`, `lruMemoize` + `maxSize` | `legacy/selectors.ts`; `features/projects/state/projectSelectors.ts` |
+| `connect`, `mapStateToProps`, `mapDispatchToProps`, `bindActionCreators`, `ConnectedProps` | `features/reports/components/ReportsContainer.tsx` |
+| container/presentational split | `ReportsContainer.tsx` + `ReportsView.tsx` |
+| `useStore` (`useAppStore`), `shallowEqual` with `useSelector` | `features/reports/components/ReportsToolbar.tsx`, `app/hooks.ts` |
+| a classic reducer mounted unchanged inside the RTK store | `legacyReports` in `app/rootReducer.ts` |
+
+**Redux Toolkit**
+
+| API | Where |
+|---|---|
+| `createReducer` + `createAction` (no slice) | `features/notifications/state/notificationsUiReducer.ts`, `features/subtasks/state/checklistDraft.ts` |
+| `createAction` with `prepare` (payload + `meta`, normalised input) | `notificationActions.ts` (`receivedAt`), `checklistDraft.ts` (`itemRenamed` trims) |
+| a REDUCER ENHANCER (higher-order reducer): undo/redo | `shared/state/undoable.ts` around `checklistDraft.ts` |
+| `createAsyncThunk`: `condition`, `rejectWithValue`, `signal`, typed ThunkApiConfig, `meta.arg` | `features/people/state/userThunks.ts` |
+| `buildCreateSlice` + `asyncThunkCreator` (`create.asyncThunk`, `create.reducer`), `.abort()` on unmount | `features/activity/state/activitySlice.ts`, `ActivityFeed.tsx` |
+| `createEntityAdapter`: `sortComparer`, custom `selectId`, `getSelectors(inputSelector)`, `upsertMany`, adapters on cache data | `people/state/peopleSlice.ts`, `projects/api/projectsApi.ts`, `labels/api/labelsApi.ts`, `activity/state/activitySlice.ts` |
+| matchers: `isAnyOf`, `isFulfilled`, `endpoint.matchFulfilled` in `extraReducers` | `peopleSlice.ts`, `timeTracking/state/timerSlice.ts`, `people/state/peopleListeners.ts` |
+| listener debounce with `cancelActiveListeners` + `delay`, per-store closure state | `features/people/state/peopleListeners.ts` |
+| selector factories per component (`useMemo(makeSelect…)`) and an inverted index | `people/state/peopleSelectors.ts`, `labels/state/labelSelectors.ts`, `projects/state/projectSelectors.ts` |
+
+**RTK Query**
+
+| API | Where |
+|---|---|
+| `enhanceEndpoints({ addTagTypes })` + `injectEndpoints` per feature | every `features/*/api/*Api.ts` |
+| `build.infiniteQuery` (`initialPageParam`, `getNextPageParam`, `maxPages`, `fetchNextPage`) | `features/notifications/api/notificationsApi.ts`, `NotificationsPage.tsx` |
+| streaming (`onCacheEntryAdded` + `EventSource` / Server-Sent Events) | `getUnreadCount` in `notificationsApi.ts` |
+| polling that switches off while the stream is open | `features/notifications/components/NotificationBell.tsx` |
+| lazy query (`useLazySearchUsersQuery`, `preferCacheValue`) | `features/people/components/PeoplePicker.tsx` |
+| optimistic updates across EVERY cached argument (`selectCachedArgsForQuery`), on infinite-query pages | `labelsApi.ts` (`setTaskLabels`), `notificationsApi.ts` (`markRead`) |
+| pessimistic cache writes (`updateQueryData`, `upsertQueryData` after `queryFulfilled`) | `projectsApi.ts` (`putMember`), `subtasksApi.ts` (`addSubtask`, `reorderSubtasks`) |
+| `selectFromResult` with a memoized derivation | `features/tasks/components/TaskPlacementFields.tsx`, `timeTracking/components/TimerWidget.tsx` |
+| a 204 → `null` via `transformResponse` | `getRunningTimer` in `timeTracking/api/timeApi.ts` |
+
 ## i18n (S25)
 
 | Concept | Where |

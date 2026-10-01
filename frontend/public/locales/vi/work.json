@@ -1,0 +1,39 @@
+{
+  "loading": "Đang tải…",
+  "checklist": {
+    "title": "Danh sách kiểm tra ({{done}}/{{total}})",
+    "progress": "Xong {{done}}/{{total}}",
+    "new": "Mục mới",
+    "add": "Thêm",
+    "delete": "Xoá mục",
+    "edit": "Sắp xếp & đổi tên",
+    "rename": "Tên mục",
+    "up": "Lên",
+    "down": "Xuống",
+    "undo": "Hoàn tác",
+    "redo": "Làm lại",
+    "save": "Lưu",
+    "cancel": "Huỷ"
+  },
+  "labels": {
+    "title": "Nhãn",
+    "new": "Nhãn mới",
+    "create": "Tạo"
+  },
+  "time": {
+    "title": "Thời gian đã ghi: {{total}}",
+    "start": "Bắt đầu tính giờ",
+    "switch": "Chuyển sang việc này",
+    "running": "Đang tính giờ cho việc này.",
+    "inProgress": "đang chạy",
+    "delete": "Xoá mục",
+    "from": "Từ",
+    "to": "Đến",
+    "note": "Ghi chú",
+    "log": "Ghi thời gian"
+  },
+  "timer": {
+    "stop": "Dừng",
+    "task": "Việc #{{id}}"
+  }
+}

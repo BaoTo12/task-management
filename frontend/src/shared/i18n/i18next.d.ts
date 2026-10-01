@@ -4,9 +4,14 @@
 // The English files are the source of truth: a key missing from them doesn't exist.
 import 'i18next';
 
+import type activity from '../../../public/locales/en/activity.json';
 import type common from '../../../public/locales/en/common.json';
 import type dashboard from '../../../public/locales/en/dashboard.json';
+import type notifications from '../../../public/locales/en/notifications.json';
+import type projects from '../../../public/locales/en/projects.json';
+import type reports from '../../../public/locales/en/reports.json';
 import type tasks from '../../../public/locales/en/tasks.json';
+import type work from '../../../public/locales/en/work.json';
 
 declare module 'i18next' {
   interface CustomTypeOptions {
@@ -15,6 +20,11 @@ declare module 'i18next' {
       common: typeof common;
       tasks: typeof tasks;
       dashboard: typeof dashboard;
+      projects: typeof projects;
+      notifications: typeof notifications;
+      activity: typeof activity;
+      work: typeof work;
+      reports: typeof reports;
     };
   }
 }

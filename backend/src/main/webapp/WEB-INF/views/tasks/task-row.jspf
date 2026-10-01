@@ -1,14 +1,15 @@
 <%--
   S39 (39.10): one task as a table row, used by the task list AND the dashboard (a translation-time include,
   pasted inside their <c:forEach>). CONTRACT: the including page provides
-    task (the loop variable), row (its varStatus), today (for isOverdue), csrfToken (for the two forms),
+    task (the loop variable), row (its varStatus), today (for isOverdue), _csrf (Spring Security's token, for the two forms),
     and optionally rowOffset (S44: rows before this page, so numbers continue across pages; null counts as 0 in EL).
   S44: the status badge is a tag file (44.11); dates and "Due in 3 days" come from TaskFlow's own tags (44.13);
   every text from the bundle (44.06).
 --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="tf" uri="urn:taskflow:tags" %>
             <tr class="${task.isOverdue(today) ? 'task-row--overdue' : ''}">
@@ -23,12 +24,12 @@
               </td>
               <td>
                 <form method="post" action="<c:url value='/tasks/toggle'/>" class="inline-form">
-                  <input type="hidden" name="_csrf" value="${csrfToken}">
+                  <input type="hidden" name="_csrf" value="${_csrf.token}">
                   <input type="hidden" name="id" value="${task.id}">
                   <button class="btn btn--sm btn--secondary" type="submit"><fmt:message key="${task.done ? 'row.reopen' : 'row.markDone'}"/></button>
                 </form>
                 <form method="post" action="<c:url value='/tasks/delete'/>" class="inline-form" data-confirm-title="${fn:escapeXml(task.title)}">
-                  <input type="hidden" name="_csrf" value="${csrfToken}">
+                  <input type="hidden" name="_csrf" value="${_csrf.token}">
                   <input type="hidden" name="id" value="${task.id}">
                   <button class="btn btn--sm btn--secondary" type="submit"><fmt:message key="row.delete"/></button>
                 </form>

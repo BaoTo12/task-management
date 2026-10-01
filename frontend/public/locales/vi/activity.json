@@ -1,0 +1,20 @@
+{
+  "title": "Hoạt động",
+  "empty": "Chưa có hoạt động nào.",
+  "more": "Hoạt động cũ hơn",
+  "loading": "Đang tải…",
+  "type": {
+    "TASK_CREATED": "đã tạo “{{subject}}”",
+    "TASK_UPDATED": "đã sửa “{{subject}}”",
+    "TASK_STATUS_CHANGED": "đã chuyển “{{subject}}” ({{details}})",
+    "TASK_ASSIGNED": "đã giao “{{subject}}”",
+    "TASK_DELETED": "đã xoá “{{subject}}”",
+    "COMMENT_ADDED": "đã bình luận về “{{subject}}”",
+    "SUBTASK_COMPLETED": "đã đánh dấu “{{details}}” trong “{{subject}}”",
+    "TIME_LOGGED": "đã ghi {{details}} cho “{{subject}}”",
+    "PROJECT_CREATED": "đã tạo dự án “{{subject}}”",
+    "PROJECT_UPDATED": "đã cập nhật dự án “{{subject}}”",
+    "MEMBER_ADDED": "đã thêm thành viên vào “{{subject}}” ({{details}})",
+    "MEMBER_REMOVED": "đã xoá {{details}} khỏi “{{subject}}”"
+  }
+}

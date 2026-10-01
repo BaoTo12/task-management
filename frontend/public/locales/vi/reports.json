@@ -1,0 +1,17 @@
+{
+  "title": "Báo cáo",
+  "from": "Từ",
+  "to": "Đến",
+  "asTable": "Xem dạng bảng",
+  "asBars": "Xem dạng biểu đồ",
+  "refresh": "Làm mới",
+  "totals": "{{created}} đã tạo · {{completed}} hoàn thành · {{open}} đang mở · {{overdue}} quá hạn",
+  "completion": "hoàn thành {{rate}}",
+  "busiest": "ngày nhiều nhất {{date}} ({{count}})",
+  "byStatus": "Theo trạng thái",
+  "byPriority": "Theo độ ưu tiên",
+  "perDay": "Hoàn thành theo ngày",
+  "range": "{{from}} → {{to}}",
+  "defaultRange": "30 ngày gần nhất",
+  "export": "Xuất CSV"
+}
