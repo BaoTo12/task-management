@@ -9,6 +9,11 @@ import { Button } from '@/shared/ui/Button';
 import { useCreateLabelMutation, useGetLabelsQuery, useSetTaskLabelsMutation } from '../api/labelsApi';
 import { selectAllLabels } from '../state/labelSelectors';
 
+import styles from './LabelPicker.module.scss';
+
+/** New labels start in neutral steel; the user can recolour them later. */
+const NEW_LABEL_COLOR = '#858b95';
+
 /** Tick labels on a task (optimistic), or create a new one and tick it. */
 export function LabelPicker({ taskId, labelIds, canEdit }: { taskId: number; labelIds: readonly number[]; canEdit: boolean }) {
   const { t } = useTranslation('work');
@@ -26,7 +31,7 @@ export function LabelPicker({ taskId, labelIds, canEdit }: { taskId: number; lab
 
   async function handleCreate() {
     try {
-      const label = await createLabel({ name: name.trim(), color: '#64748b' }).unwrap();
+      const label = await createLabel({ name: name.trim(), color: NEW_LABEL_COLOR }).unwrap();
       setName('');
       void setTaskLabels({ taskId, labelIds: [...labelIds, label.id] });
     } catch {
@@ -35,10 +40,10 @@ export function LabelPicker({ taskId, labelIds, canEdit }: { taskId: number; lab
   }
 
   return (
-    <fieldset className="label-picker" disabled={!canEdit}>
+    <fieldset className={`panel ${styles.picker}`} disabled={!canEdit}>
       <legend>{t('labels.title')}</legend>
       {labels.map((label) => (
-        <label key={label.id} className="checkbox">
+        <label key={label.id} className="form-check">
           <input type="checkbox" checked={labelIds.includes(label.id)} onChange={() => toggle(label.id)} /> {label.name}
         </label>
       ))}

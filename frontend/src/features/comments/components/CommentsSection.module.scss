@@ -1,13 +1,9 @@
 @use '@styles/abstracts' as *;
 
 // A task's comments (22.11). React-only: a CSS Module.
+// The surface comes from the design system's .panel; this only sets the inner rhythm.
 .comments {
-  display: flex;
-  flex-direction: column;
   gap: space(3);
-  margin-top: space(6);
-  padding-top: space(4);
-  border-top: 1px solid theme('border');
 }
 
 .heading {
@@ -25,9 +21,10 @@
 }
 
 .comment {
-  padding: space(2) space(3);
+  padding: space(3) space(4);
   background: theme('surface-muted');
   border-radius: $radius-md;
+  border-left: 3px solid theme('border-strong');
 
   p {
     margin: 0 0 space(1);

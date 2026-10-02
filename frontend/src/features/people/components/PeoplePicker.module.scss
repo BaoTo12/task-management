@@ -1,0 +1,22 @@
+@use '@styles/abstracts' as *;
+
+// Search-as-you-type for people (invite members). React-only: a CSS Module.
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: space(2);
+
+  > label {
+    font-size: to-rem(14px);
+    font-weight: $font-weight-medium;
+  }
+}
+
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

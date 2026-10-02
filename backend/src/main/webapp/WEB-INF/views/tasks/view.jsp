@@ -91,8 +91,9 @@
       <script type="module" nonce="${cspNonce}" src="<c:url value='${commentsIsland.script}'/>"></script>
     </c:if>
 
-    <%-- Buttons only for what this user may do (details.canEdit / canDelete); the services check again on POST. --%>
-    <p>
+    <%-- Buttons only for what this user may do (details.canEdit / canDelete); the services check again on POST.
+         .toolbar spaces them with `gap` (the design system has no .btn + .btn margin any more). --%>
+    <p class="toolbar">
       <a class="btn btn--secondary btn--sm" href="<c:url value='/tasks'/>"><fmt:message key="view.back"/></a>
       <c:if test="${details.canEdit}">
         <a class="btn btn--secondary btn--sm" href="<c:url value='/tasks/edit?id=${details.task.id}'/>"><fmt:message key="view.edit"/></a>

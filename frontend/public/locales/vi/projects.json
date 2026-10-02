@@ -21,6 +21,8 @@
   "archive": "Lưu trữ",
   "unarchive": "Bỏ lưu trữ",
   "delete": "Xoá dự án",
+  "deleteConfirm": "Xoá \"{{name}}\"? Không thể hoàn tác.",
+  "renamePrompt": "Tên mới cho dự án",
   "tasks": "Công việc",
   "form": {
     "name": "Tên",

@@ -1,0 +1,40 @@
+@use '@styles/abstracts' as *;
+
+// Tracked time on a task. React-only: a CSS Module. The surface is the design system's .panel.
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: to-rem(14px);
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: space(1) space(2);
+    padding: space(2) 0;
+    border-bottom: 1px solid theme('border');
+  }
+
+  li:last-child {
+    border-bottom: 0;
+  }
+}
+
+// The delete button sits at the right end of its entry.
+.delete {
+  margin-left: auto;
+}
+
+// "From" / "To": the caption above its datetime input.
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+  font-size: to-rem(13px);
+  color: theme('text-muted');
+}

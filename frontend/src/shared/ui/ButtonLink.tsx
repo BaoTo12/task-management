@@ -10,6 +10,6 @@ import type { ButtonStyleProps } from './button-classes';
  */
 export type ButtonLinkProps = ComponentProps<typeof Link> & ButtonStyleProps;
 
-export function ButtonLink({ variant, size, className, ...rest }: ButtonLinkProps) {
-  return <Link className={buttonClasses({ variant, size }, className)} {...rest} />;
+export function ButtonLink({ variant, size, icon, className, ...rest }: ButtonLinkProps) {
+  return <Link className={buttonClasses({ variant, size, icon }, className)} {...rest} />;
 }

@@ -1,0 +1,98 @@
+@use '../abstracts' as *;
+
+// Cascade layer (03.17): see main.scss for the order.
+// Page-level patterns shared by the React pages and (when they need them) the JSP pages. Feature-specific styles
+// do NOT belong here: they live in each feature's CSS Module, next to its component.
+@layer layout {
+  // Page header: the title on the left, the page's main actions on the right (wraps on small screens).
+  .page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: space(3) space(4);
+    margin-bottom: space(6);
+
+    .page__title {
+      margin: 0;
+    }
+
+    &__lead {
+      margin: space(2) 0 0;
+      color: theme('text-muted');
+    }
+
+    &__actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: space(2);
+    }
+  }
+
+  // A row of controls that wraps instead of overflowing (view switch, sort, filters, page actions).
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: space(2) space(3);
+
+    // The part of a toolbar that sits at its right end.
+    &__end {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: space(2) space(3);
+      margin-left: auto;
+    }
+  }
+
+  // The head of a details page (a task, a project): title, a meta row (badges…), then the actions.
+  .detail-head {
+    display: flex;
+    flex-direction: column;
+    gap: space(3);
+    margin-bottom: space(6);
+
+    .page__title {
+      margin: 0;
+    }
+
+    &__lead {
+      margin: 0;
+      color: theme('text-muted');
+    }
+
+    &__meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: space(2);
+    }
+  }
+
+  // Details pages: content on the left, facts and tools on the right (stacked below lg).
+  .detail-layout {
+    display: grid;
+    gap: space(5);
+
+    @include respond-to('lg') {
+      grid-template-columns: minmax(0, 1fr) 320px;
+      align-items: start;
+    }
+  }
+
+  .detail-main,
+  .detail-side {
+    display: flex;
+    flex-direction: column;
+    gap: space(5);
+    min-width: 0;
+  }
+
+  // While a region refreshes (aria-busy is already set for screen readers), dim it for everyone else.
+  [aria-busy='true'] {
+    opacity: 0.6;
+    transition: opacity $transition-fast;
+  }
+}

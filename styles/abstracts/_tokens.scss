@@ -10,61 +10,134 @@ $breakpoints: (
   'xl': 1280px,
 );
 
-// Keys mirror the backend enums (TaskStatus / Priority), kebab-cased.
+// Keys mirror the backend enums (TaskStatus / Priority), kebab-cased. To do is neutral steel, in progress borrows
+// the lamp, done is green: the eye goes to work that is moving. Per THEME: on graphite the pills become a soft
+// tint with a light label instead of pale chips that would outshine the amber signal.
 $status-colors: (
-  'todo':        ('bg': #e0e7ff, 'fg': #3730a3),
-  'in-progress': ('bg': #fef3c7, 'fg': #92400e),
-  'done':        ('bg': #dcfce7, 'fg': #166534),
+  'light': (
+    'todo':        ('bg': #e9ebee, 'fg': #3c424c),
+    'in-progress': ('bg': #fff0d1, 'fg': #8a5000),
+    'done':        ('bg': #dbf4e6, 'fg': #17663a),
+  ),
+  'dark': (
+    'todo':        ('bg': map.get($palette, 'graphite-700'), 'fg': map.get($palette, 'steel-150')),
+    'in-progress': ('bg': color.change(map.get($palette, 'lamp-400'), $alpha: 0.18), 'fg': map.get($palette, 'lamp-300')),
+    'done':        ('bg': color.change(map.get($palette, 'green-400'), $alpha: 0.18), 'fg': map.get($palette, 'green-400')),
+  ),
 );
 
+/// A theme's status map → flat tokens: ('status-todo-bg': …, 'status-todo-fg': …, …)
+@function _status-tokens($theme-name) {
+  $tokens: ();
+  @each $status, $colors in map.get($status-colors, $theme-name) {
+    $tokens: map.merge($tokens, (
+      'status-#{$status}-bg': map.get($colors, 'bg'),
+      'status-#{$status}-fg': map.get($colors, 'fg'),
+    ));
+  }
+  @return $tokens;
+}
+
+/// The status names, for loops that generate one class per status (.badge--todo, …).
+$statuses: map.keys(map.get($status-colors, 'light'));
+
+// Bright: for SHAPES (the card stripe, PriorityBar, meters). Text in these hues uses the themed
+// 'priority-<p>-text' tokens below, which keep 4.5:1 on the surface (WCAG 1.4.3).
 $priority-colors: (
-  'low': #14b8a6,
-  'medium': #f59e0b,
-  'high': #ef4444,
+  'low': #2ba39a,
+  'medium': #f5a524,
+  'high': #e5484d,
 );
 
 // Semantic colour tokens per theme → emitted as --color-<name> in base/_root.scss
-// Derived colours (02.08 sass:color): hover and focus shades are COMPUTED from their base colour, so changing
-// the brand colour updates every derived shade. color.scale moves a channel by a % of the remaining room
-// (predictable at both ends); color.change sets a channel outright (here: alpha).
-$_primary-light: map.get($palette, 'indigo-600');
-$_primary-dark: map.get($palette, 'indigo-400');
-$_danger-light: map.get($palette, 'red-600');
-$_danger-dark: map.get($palette, 'red-400');
+//   primary / primary-hover   accent used for TEXT and lines (links, active nav, selected): readable on the surface
+//   lamp / lamp-hover / on-lamp   the bright amber FILL (primary buttons, the active-nav lamp dot), dark text on it
+//   ink                        the outline colour of "inked" surfaces (cards, panels, inputs on hover)
+//   rail / rail-text / rail-muted  the graphite sidebar, the same in both themes (the droid's visor band)
+//   on-rail / rail-hover / rail-active / rail-field / rail-line / rail-shadow   strong text and white tints ON the rail
+//   paper / paper-muted / on-paper / on-paper-muted   the white "sticker" surfaces on the rail (login porthole, bubble)
+//   on-ink / on-danger         text on an ink or danger fill
+//   scrim                      dims the page behind the mobile drawer
+// Derived colours (02.08 sass:color): hover and focus shades are COMPUTED from their base colour.
+$_lamp: map.get($palette, 'lamp-400');
+$_danger-light: map.get($palette, 'signal-600');
+$_danger-dark: map.get($palette, 'signal-400');
+$_white: map.get($palette, 'white');
+
+// The rail and the login bench are graphite in BOTH themes, so their tints are the same in both.
+$_on-graphite: (
+  'on-rail':        $_white,
+  'rail-hover':     color.change($_white, $alpha: 0.06),
+  'rail-active':    color.change($_white, $alpha: 0.08),
+  'rail-field':     color.change($_white, $alpha: 0.05),
+  'rail-line':      color.change($_white, $alpha: 0.12),
+  'rail-shadow':    rgba(0, 0, 0, 0.35),
+  'paper':          $_white,
+  'paper-muted':    map.get($palette, 'shell'),
+  'on-paper':       map.get($palette, 'graphite-800'),
+  'on-paper-muted': map.get($palette, 'steel-500'),
+  'on-ink':         $_white,
+  'on-danger':      $_white,
+  'scrim':          color.change(map.get($palette, 'graphite-950'), $alpha: 0.5),
+);
 
 $themes: (
-  'light': (
-    'primary':       map.get($palette, 'indigo-600'),
-    'primary-hover': color.scale($_primary-light, $lightness: -15%),
+  'light': map.merge(map.merge($_on-graphite, _status-tokens('light')), (
+    'priority-low-text':    #1b6f68,
+    'priority-medium-text': #8a5000,
+    'priority-high-text':   #b42318,
+    'primary':       map.get($palette, 'lamp-700'),
+    'primary-hover': color.scale(map.get($palette, 'lamp-700'), $lightness: -18%),
+    'primary-soft':  color.change($_lamp, $alpha: 0.16),
     'on-primary':    map.get($palette, 'white'),
-    'danger':        map.get($palette, 'red-600'),
+    'lamp':          $_lamp,
+    'lamp-hover':    map.get($palette, 'lamp-500'),
+    'on-lamp':       map.get($palette, 'graphite-800'),
+    'ink':           map.get($palette, 'graphite-800'),
+    'danger':        $_danger-light,
     'danger-hover':  color.scale($_danger-light, $lightness: -15%),
-    'success':       #16a34a,
-    'warning':       #d97706,
-    'text':          map.get($palette, 'slate-900'),
-    'text-muted':    map.get($palette, 'slate-500'),
-    'border':        map.get($palette, 'slate-200'),
+    'success':       map.get($palette, 'green-600'),
+    'warning':       map.get($palette, 'lamp-700'),
+    'text':          map.get($palette, 'graphite-800'),
+    'text-muted':    map.get($palette, 'steel-500'),
+    'border':        map.get($palette, 'steel-150'),
+    'border-strong': map.get($palette, 'steel-200'),
     'surface':       map.get($palette, 'white'),
-    'surface-muted': map.get($palette, 'slate-100'),
-    'background':    map.get($palette, 'slate-50'),
-    'focus-ring':    color.change($_primary-light, $alpha: 0.25),
-  ),
-  'dark': (
-    'primary':       map.get($palette, 'indigo-400'),
-    'primary-hover': color.scale($_primary-dark, $lightness: 30%),
-    'on-primary':    map.get($palette, 'slate-900'),
-    'danger':        map.get($palette, 'red-400'),
-    'danger-hover':  color.scale($_danger-dark, $lightness: 30%),
-    'success':       #4ade80,
-    'warning':       #fbbf24,
-    'text':          map.get($palette, 'slate-100'),
-    'text-muted':    map.get($palette, 'slate-400'),
-    'border':        map.get($palette, 'slate-700'),
-    'surface':       map.get($palette, 'slate-800'),
-    'surface-muted': color.mix(map.get($palette, 'slate-800'), map.get($palette, 'slate-700'), 70%),
-    'background':    map.get($palette, 'slate-900'),
-    'focus-ring':    color.change($_primary-dark, $alpha: 0.35),
-  ),
+    'surface-muted': map.get($palette, 'steel-100'),
+    'background':    map.get($palette, 'shell'),
+    'rail':          map.get($palette, 'graphite-800'),
+    'rail-text':     map.get($palette, 'steel-150'),
+    'rail-muted':    map.get($palette, 'steel-400'),
+    'focus-ring':    color.change($_lamp, $alpha: 0.45),
+  )),
+  'dark': map.merge(map.merge($_on-graphite, _status-tokens('dark')), (
+    'priority-low-text':    map.get($priority-colors, 'low'),
+    'priority-medium-text': map.get($priority-colors, 'medium'),
+    'priority-high-text':   map.get($palette, 'signal-400'),
+    'primary':       map.get($palette, 'lamp-400'),
+    'primary-hover': map.get($palette, 'lamp-300'),
+    'primary-soft':  color.change($_lamp, $alpha: 0.14),
+    'on-primary':    map.get($palette, 'graphite-800'),
+    'lamp':          $_lamp,
+    'lamp-hover':    map.get($palette, 'lamp-300'),
+    'on-lamp':       map.get($palette, 'graphite-800'),
+    'ink':           map.get($palette, 'graphite-650'),
+    'danger':        $_danger-dark,
+    'danger-hover':  color.scale($_danger-dark, $lightness: 25%),
+    'success':       map.get($palette, 'green-400'),
+    'warning':       map.get($palette, 'lamp-300'),
+    'text':          #eceef0,
+    'text-muted':    map.get($palette, 'steel-300'),
+    'border':        map.get($palette, 'graphite-700'),
+    'border-strong': map.get($palette, 'graphite-650'),
+    'surface':       map.get($palette, 'graphite-850'),
+    'surface-muted': map.get($palette, 'graphite-750'),
+    'background':    map.get($palette, 'graphite-900'),
+    'rail':          map.get($palette, 'graphite-950'),
+    'rail-text':     map.get($palette, 'steel-150'),
+    'rail-muted':    map.get($palette, 'steel-400'),
+    'focus-ring':    color.change($_lamp, $alpha: 0.5),
+  )),
 );
 
 // ─── Guard: every theme must define exactly the same tokens as 'light' ───

@@ -9,6 +9,9 @@ import { Button } from '@/shared/ui/Button';
 
 import { useCreateProjectMutation } from '../api/projectsApi';
 
+/** The lamp amber (#rrggbb: the API stores a hex colour, not a CSS variable). */
+const DEFAULT_PROJECT_COLOR = '#f5a524';
+
 /** Create a project, then open it. `.unwrap()` turns the mutation's result into a promise that THROWS on error. */
 export function NewProjectForm() {
   const { t } = useTranslation('projects');
@@ -16,7 +19,7 @@ export function NewProjectForm() {
   const errorMessage = useErrorMessage();
   const [createProject, { isLoading, error }] = useCreateProjectMutation();
   const [name, setName] = useState('');
-  const [color, setColor] = useState('#2563eb');
+  const [color, setColor] = useState(DEFAULT_PROJECT_COLOR);
   const nameError = fieldErrorsOf(error)?.name;
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {

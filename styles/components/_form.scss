@@ -6,17 +6,62 @@
     display: flex;
     flex-direction: column;
     gap: space(4);
-    max-width: 560px;
+    max-width: 640px;
 
     &__actions {
       display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       gap: space(2);
       margin-top: space(2);
+    }
 
-      .btn + .btn {
-        margin-left: 0;
+    // A compact one-line form (add a checklist item, create a label, new project): wraps on narrow screens.
+    // Usable alone (class="form--inline") or with .form.
+    &--inline {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: space(2);
+      max-width: none;
+
+      > input:not([type='checkbox'], [type='color']),
+      > label {
+        flex: 1 1 12rem;
+        min-width: 0;
+      }
+
+      > label {
+        display: flex;
+        flex-direction: column;
+        gap: space(1);
+        font-size: to-rem(13px);
+        font-weight: $font-weight-medium;
+        color: theme('text-muted');
       }
     }
+
+    // A form on its own surface (new/edit task, settings): `form panel form--panel`. Declared after .form and
+    // in the same layer as .panel (card comes before form in main.scss), so its width and padding win.
+    &--panel {
+      max-width: 720px;
+      padding: space(5);
+
+      @include respond-to('md') {
+        padding: space(6) space(8);
+      }
+    }
+  }
+
+  // A checkbox or radio with its label on one line (label filters, notification settings).
+  .form-check {
+    display: inline-flex;
+    align-items: center;
+    gap: space(2);
+    margin-right: space(4);
+    font-size: to-rem(14px);
+    cursor: pointer;
   }
 
   .form-field {
@@ -29,33 +74,10 @@
       font-weight: $font-weight-medium;
     }
 
+    // The same `control` mixin as bare inputs (base/_typography), at form height (40px).
     &__input {
       width: 100%;
-      padding: space(2) space(3);
-      font-size: to-rem(14px);
-      line-height: 1.5;
-      color: theme('text');
-      background: theme('surface');
-      border: 1px solid theme('border');
-      border-radius: $radius-md;
-      transition:
-        border-color $transition-fast,
-        box-shadow $transition-fast;
-
-      &::placeholder {
-        color: theme('text-muted');
-      }
-
-      &:focus {
-        outline: none;
-        border-color: theme('primary');
-        box-shadow: 0 0 0 3px theme('focus-ring');
-      }
-
-      &:disabled {
-        background: theme('surface-muted');
-        cursor: not-allowed;
-      }
+      @include control;
 
       &[aria-invalid='true'] {
         border-color: theme('danger');
@@ -69,11 +91,7 @@
 
     // 02.11 stretch: custom select arrow
     @at-root select#{&}__input {
-      appearance: none;
-      padding-right: space(8);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8 1 3h10z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right space(3) center;
+      @include select-chevron;
     }
 
     &__help {
@@ -100,6 +118,11 @@
 
     &--inline &__input {
       width: auto;
+    }
+
+    &--inline &__label {
+      white-space: nowrap;
+      color: theme('text-muted');
     }
   }
 }

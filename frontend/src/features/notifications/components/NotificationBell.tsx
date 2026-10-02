@@ -1,8 +1,10 @@
+import { Bell as BellIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import styled, { css, keyframes } from 'styled-components';
 
 import { useAppSelector } from '@/app/hooks';
+
+import { ButtonLink } from '@/shared/ui/ButtonLink';
 
 import { useGetUnreadCountQuery } from '../api/notificationsApi';
 
@@ -12,25 +14,36 @@ const ring = keyframes`
   75% { transform: rotate(-12deg); }
 `;
 
-const Bell = styled(Link)<{ $ringing: boolean }>`
+/** The design system's square icon button (.btn--icon), plus room for the count and the ring animation. */
+const Bell = styled(ButtonLink)<{ $ringing: boolean }>`
   position: relative;
-  text-decoration: none;
-  ${({ $ringing }) => $ringing && css`animation: ${ring} 0.4s ease-in-out 2;`}
+
+  svg {
+    ${({ $ringing }) => $ringing && css`animation: ${ring} 0.4s ease-in-out 2;`}
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    animation: none;
+    svg {
+      animation: none;
+    }
   }
 `;
 
+/** Unread count: the amber lamp with graphite text, the same signal colour as everywhere else. */
 const Count = styled.span`
   position: absolute;
-  top: -6px;
-  right: -10px;
-  min-width: 18px;
-  padding: 0 4px;
-  border-radius: 9px;
-  background: ${({ theme }) => theme.colors.danger};
-  color: #fff;
-  font-size: 11px;
+  top: -7px;
+  right: -7px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border: 1.5px solid ${({ theme }) => theme.colors.ink};
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ theme }) => theme.colors.lamp};
+  color: ${({ theme }) => theme.colors.onLamp};
+  font-size: 0.6875rem;
+  font-weight: ${({ theme }) => theme.fontWeights.bold};
+  line-height: 17px;
   text-align: center;
 `;
 
@@ -49,8 +62,9 @@ export function NotificationBell() {
     skipPollingIfUnfocused: true,
   });
   return (
-    <Bell to="/notifications" $ringing={lastLiveId !== null} key={lastLiveId ?? 0} aria-label={t('bell', { count })}>
-      🔔{count > 0 && <Count>{count > 99 ? '99+' : count}</Count>}
+    <Bell icon to="/notifications" $ringing={lastLiveId !== null} key={lastLiveId ?? 0} aria-label={t('bell', { count })}>
+      <BellIcon aria-hidden="true" />
+      {count > 0 && <Count>{count > 99 ? '99+' : count}</Count>}
     </Bell>
   );
 }

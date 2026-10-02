@@ -12,7 +12,9 @@ export function ReportsPage() {
   const { t } = useTranslation('reports');
   return (
     <section>
-      <h1 className="page__title">{t('title')}</h1>
+      <div className="page-head">
+        <h1 className="page__title">{t('title')}</h1>
+      </div>
       <ReportsToolbar />
       <ReportsContainer />
     </section>

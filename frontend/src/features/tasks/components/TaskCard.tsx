@@ -1,3 +1,4 @@
+import { CircleCheck, Pencil, RotateCcw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -100,12 +101,14 @@ export function TaskCard({ task, onToggle, onEditTitle, selected, onSelect }: Ta
         </div>
         <div className={styles.badges}>
           {!isEditing && (
-            <ButtonLink size="sm" to={`/tasks/${task.id}/edit`} state={linkState}>
-              {t('card.edit')}
+            <ButtonLink size="sm" to={`/tasks/${task.id}/edit`} state={linkState} aria-label={t('card.edit')}>
+              <Pencil aria-hidden="true" />
+              <span className={styles.actionText}>{t('card.edit')}</span>
             </ButtonLink>
           )}
-          <Button size="sm" onClick={() => onToggle(task.id)}>
-            {isDone ? t('card.reopen') : t('card.markDone')}
+          <Button size="sm" onClick={() => onToggle(task.id)} aria-label={isDone ? t('card.reopen') : t('card.markDone')}>
+            {isDone ? <RotateCcw aria-hidden="true" /> : <CircleCheck aria-hidden="true" />}
+            <span className={styles.actionText}>{isDone ? t('card.reopen') : t('card.markDone')}</span>
           </Button>
         </div>
       </footer>

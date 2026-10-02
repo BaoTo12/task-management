@@ -1,4 +1,5 @@
 import { skipToken } from '@reduxjs/toolkit/query/react';
+import { Columns3, LayoutList, Plus } from 'lucide-react';
 import { useCallback, useRef, useState, useTransition } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
@@ -23,7 +24,6 @@ import { ButtonLink } from '@/shared/ui/ButtonLink';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import type { ConfirmDialogHandle } from '@/shared/ui/ConfirmDialog';
 import { ProgressRing } from '@/shared/ui/styled/ProgressRing';
-import { Stack } from '@/shared/ui/styled/Stack';
 
 import { Board } from '../components/Board';
 import { BulkBar } from '../components/BulkBar';
@@ -38,13 +38,14 @@ import { toggleTask } from '../state/taskActions';
 import { selectCompletedTaskIds, selectSort, selectTaskStats } from '../state/taskListSelectors';
 import { LIST_QUERY, selectTaskById } from '../state/taskSelectors';
 
+import styles from './TasksPage.module.scss';
+
 type View = 'list' | 'board';
 
 export function TasksPage() {
   const listResult = useGetTasksQuery(LIST_QUERY);
   const { t } = useTranslation(['tasks', 'common']);
   const errorMessage = useErrorMessage();
-  // Stable results only (21.05): memoised stats and ids. They read the same cache entry.
   const stats = useAppSelector(selectTaskStats);
   const completedIds = useAppSelector(selectCompletedTaskIds);
   const [clearCompleted] = useClearCompletedMutation();
@@ -162,11 +163,15 @@ export function TasksPage() {
     content =
       view === 'list' ? (
         <>
-          <CategorySidebar selected={categoryFilter} />
-          <FilterBar value={statusFilter} onChange={(s) => setParam('status', s)} />
-          <WorkFilters projectId={projectFilter} labelId={labelFilter} mine={mineOnly} onChange={setParam} />
+          <div className={styles.filters}>
+            <SearchBox value={q} onChange={(value) => setParam('q', value)} />
+            <CategorySidebar selected={categoryFilter} />
+            <FilterBar value={statusFilter} onChange={(s) => setParam('status', s)} />
+            <WorkFilters projectId={projectFilter} labelId={labelFilter} mine={mineOnly} onChange={setParam} />
+          </div>
           <BulkBar />
-          <div style={{ opacity: pageResult.isFetching ? 0.6 : 1 }} aria-busy={pageResult.isFetching}>
+          {/* aria-busy also dims the old page while the next one loads (styles/layout/_page-parts.scss) */}
+          <div aria-busy={pageResult.isFetching}>
             <TaskList
               tasks={shown?.items ?? []}
               onToggle={handleToggle}
@@ -177,14 +182,16 @@ export function TasksPage() {
             />
           </div>
           {shown && (
-            <Pager
-              page={shown.page}
-              totalPages={shown.totalPages}
-              totalItems={shown.totalItems}
-              pageSize={pageSize}
-              onPageChange={(next) => setParam('page', String(next + 1))}
-              onPageSizeChange={handlePageSize}
-            />
+            <div className={styles.pager}>
+              <Pager
+                page={shown.page}
+                totalPages={shown.totalPages}
+                totalItems={shown.totalItems}
+                pageSize={pageSize}
+                onPageChange={(next) => setParam('page', String(next + 1))}
+                onPageSizeChange={handlePageSize}
+              />
+            </div>
           )}
         </>
       ) : (
@@ -194,10 +201,25 @@ export function TasksPage() {
 
   return (
     <>
-      <h1 className="page__title">
-        {t('title')} {hasData && <span className="text-muted">({stats.total})</span>}
-        {isFetching && !isLoading && <span className="text-muted"> · {t('refreshing')}</span>}
-      </h1>
+      <div className="page-head">
+        <div>
+          <h1 className="page__title">
+            {t('title')} {hasData && <span className="text-muted">({stats.total})</span>}
+          </h1>
+          {isFetching && !isLoading && <p className="page-head__lead">{t('refreshing')}</p>}
+        </div>
+        <div className="page-head__actions">
+          {user && doneCount > 0 && (
+            <Button size="sm" variant="danger" onClick={() => void handleClearCompleted()}>
+              {t('clearCompleted', { count: doneCount })}
+            </Button>
+          )}
+          <ButtonLink variant="primary" to="/tasks/new">
+            <Plus aria-hidden="true" />
+            {t('newTask')}
+          </ButtonLink>
+        </div>
+      </div>
       {isError && (view === 'list' ? shown !== undefined : stats.total > 0) && (
         <p role="alert" className="text-danger">
           {t('refreshFailed', { message: errorMessage(error) })}{' '}
@@ -206,33 +228,44 @@ export function TasksPage() {
           </Button>
         </p>
       )}
-      {hasData && (
-        <Stack $direction="row" $gap={4} $align="center">
-          <ProgressRing done={stats.done} total={stats.total} />
-          <span className="text-muted">{t('tasksDone')}</span>
-        </Stack>
-      )}
-      <Stack $direction="row" $gap={2} $align="center" $wrap>
-        <div role="group" aria-label={t('view.label')}>
-          <Button size="sm" variant={view === 'list' ? 'primary' : 'secondary'} onClick={() => startSwitching(() => setParam('view', null))}>
-            {t('view.list')}
-          </Button>
-          <Button size="sm" variant={view === 'board' ? 'primary' : 'secondary'} onClick={() => startSwitching(() => setParam('view', 'board'))}>
-            {t('view.board')}
-          </Button>
-        </div>
-        <ButtonLink variant="primary" size="sm" to="/tasks/new">
-          {t('newTask')}
-        </ButtonLink>
-        {user && doneCount > 0 && (
-          <Button size="sm" variant="danger" onClick={() => void handleClearCompleted()}>
-            {t('clearCompleted', { count: doneCount })}
-          </Button>
+      <div className="toolbar">
+        {hasData && (
+          <div className={styles.summary}>
+            <ProgressRing done={stats.done} total={stats.total} />
+            <div className={styles.summaryText}>
+              <strong>
+                {stats.done}/{stats.total}
+              </strong>
+              <span>{t('tasksDone')}</span>
+            </div>
+          </div>
         )}
-        <SortControl />
-      </Stack>
+        <div className="toolbar__end">
+          <div className="segmented" role="group" aria-label={t('view.label')}>
+            <Button
+              size="sm"
+              variant={view === 'list' ? 'primary' : 'secondary'}
+              aria-pressed={view === 'list'}
+              onClick={() => startSwitching(() => setParam('view', null))}
+            >
+              <LayoutList aria-hidden="true" />
+              {t('view.list')}
+            </Button>
+            <Button
+              size="sm"
+              variant={view === 'board' ? 'primary' : 'secondary'}
+              aria-pressed={view === 'board'}
+              onClick={() => startSwitching(() => setParam('view', 'board'))}
+            >
+              <Columns3 aria-hidden="true" />
+              {t('view.board')}
+            </Button>
+          </div>
+          <SortControl />
+        </div>
+      </div>
       {lastTask && (
-        <p className="text-muted">
+        <p className="text-muted mt-4">
           {/* <Trans> (25.08): the translation decides WHERE the link goes in the sentence (word order differs
               between languages); <link> in the string is replaced by the element below. The title is a VALUE:
               escaped by React like any text, never parsed as markup. */}
@@ -244,9 +277,7 @@ export function TasksPage() {
           />
         </p>
       )}
-      {view === 'list' && <SearchBox value={q} onChange={(value) => setParam('q', value)} />}
-      <hr />
-      <div style={{ opacity: isSwitching ? 0.6 : 1 }} aria-busy={isSwitching}>
+      <div aria-busy={isSwitching}>
         {content}
       </div>
       <ConfirmDialog ref={confirmDialog} />

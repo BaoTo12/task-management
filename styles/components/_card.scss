@@ -6,29 +6,41 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: space(2);
-    padding: space(4);
-    padding-left: space(5);
+    gap: space(2.5);
+    height: 100%;
+    padding: space(4) space(4) space(4) space(5);
     background: theme('surface');
-    border: 1px solid theme('border');
+    border: 1.5px solid theme('border-strong');
     border-radius: $radius-lg;
-    box-shadow: $shadow-sm;
     overflow: hidden;
     // A size container (03.17 @container): what's INSIDE a card adapts to the card's width, not the viewport's.
     // The same TaskCard is wide in the list grid and narrow in a board column.
     container-type: inline-size;
-    transition: box-shadow $transition-fast;
+    transition:
+      box-shadow $transition-fast,
+      border-color $transition-fast,
+      transform $transition-fast;
 
+    // Hover: the outline inks in and the card lifts like a sticker (the only hover motion in the app's lists).
     &:hover {
-      box-shadow: $shadow-md;
+      border-color: theme('ink');
+      box-shadow: $shadow-ink;
+      transform: translate(-1px, -1px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      &:hover {
+        transform: none;
+      }
     }
 
     // Priority stripe on the left edge
     &::before {
       content: '';
       position: absolute;
-      inset: 0 auto 0 0;
-      width: space(1);
+      inset: space(3) auto space(3) 0;
+      width: 4px;
+      border-radius: 0 $radius-full $radius-full 0;
       background: theme('border');
     }
 
@@ -40,18 +52,26 @@
     }
 
     &__title {
-      font-size: to-rem(18px);
+      display: flex;
+      align-items: flex-start;
+      gap: space(2);
+      font-size: to-rem(16px);
       font-weight: $font-weight-semibold;
-      line-height: 1.3;
-      @include truncate(2);
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+
+      input[type='checkbox'] {
+        flex-shrink: 0;
+        margin-top: 3px;
+      }
 
       a {
         color: inherit;
         text-decoration: none;
+        @include truncate(2);
 
         &:hover {
           color: theme('primary');
-          text-decoration: underline;
         }
       }
     }
@@ -59,24 +79,38 @@
     &__body {
       color: theme('text-muted');
       font-size: to-rem(14px);
+      overflow-wrap: anywhere;
+      @include truncate(3);
+
+      &:empty {
+        display: none;
+      }
     }
 
     &__meta {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
+      gap: space(2);
       margin-top: auto;
-      padding-top: space(2);
+      padding-top: space(3);
+      border-top: 1px dashed theme('border');
     }
+  }
 
-    &__due {
-      font-size: to-rem(12px);
-      color: theme('text-muted');
+  // A plain surface for grouping (detail sections, panels, toolbars).
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: space(3);
+    padding: space(5);
+    background: theme('surface');
+    border: 1.5px solid theme('border');
+    border-radius: $radius-lg;
 
-      &--overdue {
-        color: theme('danger');
-        font-weight: $font-weight-semibold;
-      }
+    > h2:first-child {
+      font-size: to-rem(16px);
     }
   }
 }

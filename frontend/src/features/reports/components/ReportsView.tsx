@@ -8,6 +8,8 @@ import { Stack } from '@/shared/ui/styled/Stack';
 import type { ChartMode } from '../legacy/actions';
 import type { ReportsViewModel } from '../legacy/selectors';
 
+import styles from './ReportsView.module.scss';
+
 /**
  * PRESENTATIONAL ("dumb") component: props in, JSX out. It knows nothing about Redux; ReportsContainer connects it.
  * The container/presentational split was THE classic React-Redux pattern before hooks.
@@ -39,7 +41,7 @@ export function ReportsView(props: ReportsViewProps) {
   const { t, i18n } = useTranslation(['reports', 'common']);
 
   return (
-    <section className="reports">
+    <section className={styles.reports}>
       <Stack $direction="row" $gap={2} $align="center" $wrap>
         <label>
           {t('from')}{' '}
@@ -72,7 +74,7 @@ export function ReportsView(props: ReportsViewProps) {
       )}
       {summary && (
         <>
-          <p className="stats">
+          <p className={styles.stats}>
             {t('totals', { ...summary.totals })} · {t('completion', { rate: formatPercent(completionRate, i18n.language) })}
             {busiestDay && <> · {t('busiest', { date: formatDate(busiestDay.date, i18n.language), count: busiestDay.count })}</>}
           </p>

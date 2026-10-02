@@ -1,0 +1,28 @@
+@use '@styles/abstracts' as *;
+
+// A project's members. React-only: a CSS Module. The surface is the design system's .panel.
+.members {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: space(2) space(3);
+    padding: space(3) 0;
+    border-bottom: 1px solid theme('border');
+  }
+
+  li:last-child {
+    border-bottom: 0;
+  }
+}
+
+.name {
+  flex: 1 1 10rem;
+  font-weight: $font-weight-medium;
+}

@@ -10,6 +10,6 @@ import type { ButtonStyleProps } from './button-classes';
 export type ButtonProps = ComponentPropsWithRef<'button'> & ButtonStyleProps;
 
 /** Wraps the design system's .btn classes (styles/components/_button.scss). */
-export function Button({ variant, size, type = 'button', className, ...rest }: ButtonProps) {
-  return <button type={type} className={buttonClasses({ variant, size }, className)} {...rest} />;
+export function Button({ variant, size, icon, type = 'button', className, ...rest }: ButtonProps) {
+  return <button type={type} className={buttonClasses({ variant, size, icon }, className)} {...rest} />;
 }

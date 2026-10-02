@@ -1,0 +1,50 @@
+@use '@styles/abstracts' as *;
+
+// A task's checklist. React-only: a CSS Module. The surface is the design system's .panel.
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: space(1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: space(2);
+    min-height: 40px;
+    padding: space(1) space(2);
+    border-radius: $radius-md;
+
+    &:hover {
+      background: theme('surface-muted');
+    }
+
+    label {
+      display: flex;
+      flex: 1;
+      align-items: center;
+      gap: space(3);
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    // Edit mode: the title input takes the row.
+    > input:not([type='checkbox']) {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+}
+
+.done label {
+  color: theme('text-muted');
+  text-decoration: line-through;
+  text-decoration-color: theme('border-strong');
+}
+
+.addForm {
+  flex: 1;
+}

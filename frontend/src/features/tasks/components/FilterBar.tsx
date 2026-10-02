@@ -14,7 +14,7 @@ interface FilterBarProps {
 export function FilterBar({ value, onChange }: FilterBarProps) {
   const { t } = useTranslation(['tasks', 'common']);
   return (
-    <div className={styles.bar} role="group" aria-label={t('filter.label')}>
+    <div className={`segmented ${styles.bar}`} role="group" aria-label={t('filter.label')}>
       <Button
         size="sm"
         variant={value === null ? 'primary' : 'secondary'}

@@ -7,9 +7,11 @@ export type ButtonSize = 'md' | 'sm';
 export interface ButtonStyleProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  /** A square, icon-only button (.btn--icon). It has no visible text, so give it an aria-label. */
+  icon?: boolean;
 }
 
-/** { variant: 'primary', size: 'sm' } → 'btn btn--primary btn--sm' (+ any extra class). */
-export function buttonClasses({ variant = 'secondary', size = 'md' }: ButtonStyleProps, className?: string): string {
-  return ['btn', `btn--${variant}`, size === 'sm' && 'btn--sm', className].filter(Boolean).join(' ');
+/** { variant: 'primary', size: 'sm', icon: true } → 'btn btn--primary btn--sm btn--icon' (+ any extra class). */
+export function buttonClasses({ variant = 'secondary', size = 'md', icon = false }: ButtonStyleProps, className?: string): string {
+  return ['btn', `btn--${variant}`, size === 'sm' && 'btn--sm', icon && 'btn--icon', className].filter(Boolean).join(' ');
 }

@@ -1,4 +1,3 @@
-@use 'sass:map';
 @use '../abstracts' as *;
 
 // Cascade layer (03.17): see main.scss for the order.
@@ -6,6 +5,7 @@
   .badge {
     display: inline-flex;
     align-items: center;
+    gap: space(1);
     padding: 2px space(2);
     border-radius: $radius-full;
     font-size: to-rem(12px);
@@ -13,19 +13,28 @@
     line-height: 1.5;
     white-space: nowrap;
 
-    // .badge--todo, .badge--in-progress, .badge--done
-    @each $status, $colors in $status-colors {
+    // .badge--todo, .badge--in-progress, .badge--done: a dot + the label (themed colours)
+    @each $status in $statuses {
       &--#{$status} {
-        background: map.get($colors, 'bg');
-        color: map.get($colors, 'fg');
+        background: theme('status-#{$status}-bg');
+        color: theme('status-#{$status}-fg');
+
+        &::before {
+          content: '';
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: currentColor;
+        }
       }
     }
 
-    // .badge--priority-low, -medium, -high
+    // .badge--priority-low, -medium, -high: the bright hue tints the pill; the TEXT uses the darker themed token
     @each $priority, $color in $priority-colors {
       &--priority-#{$priority} {
-        color: $color;
-        box-shadow: inset 0 0 0 1px $color;
+        color: theme('priority-#{$priority}-text');
+        background: color-mix(in srgb, #{$color} 10%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, #{$color} 45%, transparent);
       }
     }
   }

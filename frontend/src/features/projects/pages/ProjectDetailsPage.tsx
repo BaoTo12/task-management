@@ -1,5 +1,5 @@
 import { skipToken } from '@reduxjs/toolkit/query/react';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 
@@ -9,18 +9,24 @@ import { ActivityFeed } from '@/features/activity';
 
 import { isNotFoundError } from '@/shared/api/api-error';
 import { useGetTasksQuery } from '@/shared/api/apiSlice';
+import { isSafeHexColor } from '@/shared/domain/color';
 import { TASK_STATUSES } from '@/shared/domain/types';
 import { useErrorMessage } from '@/shared/i18n/useErrorMessage';
+import { theme } from '@/shared/theme/theme';
 import { Breadcrumbs } from '@/shared/ui/Breadcrumbs';
 import { Button } from '@/shared/ui/Button';
+import { ButtonLink } from '@/shared/ui/ButtonLink';
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
+import type { ConfirmDialogHandle } from '@/shared/ui/ConfirmDialog';
 import { NotFoundPage } from '@/shared/ui/NotFoundPage';
 import { Meter } from '@/shared/ui/styled/Meter';
-import { Stack } from '@/shared/ui/styled/Stack';
 
 import { useDeleteProjectMutation, useGetMembersQuery, useGetProjectQuery, useUpdateProjectMutation } from '../api/projectsApi';
 import { MembersPanel } from '../components/MembersPanel';
 import { canArchive } from '../model/permissions';
 import { makeSelectProjectView, projectTasksQuery } from '../state/projectSelectors';
+
+import styles from './ProjectDetailsPage.module.scss';
 
 /**
  * One project: progress, its tasks by status, the members (with role management) and the activity feed.
@@ -33,6 +39,7 @@ export function ProjectDetailsPage() {
   const { t } = useTranslation(['projects', 'common']);
   const errorMessage = useErrorMessage();
   const navigate = useNavigate();
+  const confirmDialog = useRef<ConfirmDialogHandle>(null);
 
   const { error, isLoading } = useGetProjectQuery(valid ? projectId : skipToken);
   useGetMembersQuery(valid ? projectId : skipToken);
@@ -54,20 +61,44 @@ export function ProjectDetailsPage() {
     );
   }
   const { project, members, tasksByStatus, progress, myRole, canEdit, canManage } = view;
+  // The colour comes from the API: untrusted, so it's validated before it reaches CSS (like Tag does).
+  const progressColor = isSafeHexColor(project.color) ? project.color : theme.colors.primary;
+
+  function handleRename() {
+    // window.prompt keeps the demo small; a real app would use an inline edit (see TaskCard's title editing).
+    const answer = window.prompt(t('renamePrompt'), project.name)?.trim();
+    if (!answer || answer === project.name) return; // cancelled or unchanged: no request
+    void updateProject({ id: project.id, changes: { name: answer } });
+  }
+
+  async function handleDelete() {
+    const confirmed = await confirmDialog.current?.confirm({
+      title: t('delete'),
+      message: t('deleteConfirm', { name: project.name }),
+      confirmLabel: t('delete'),
+      cancelLabel: t('common:confirm.cancel'),
+    });
+    if (!confirmed) return;
+    // Leave first (the page would otherwise refetch a project that no longer exists), then delete.
+    navigate('/projects', { replace: true });
+    void deleteProject(project.id);
+  }
 
   return (
     <article>
       <Breadcrumbs label={t('common:breadcrumb.label')} items={[{ label: t('title'), to: '/projects' }, { label: project.name }]} />
-      <h1 className="page__title">{project.name}</h1>
-      {project.description && <p>{project.description}</p>}
-      <Meter value={progress.done} max={Math.max(progress.total, 1)} color={project.color} label={t('progress', progress)} />
+      <header className="detail-head">
+        <h1 className="page__title">{project.name}</h1>
+        {project.description && <p className="detail-head__lead">{project.description}</p>}
+        <Meter value={progress.done} max={Math.max(progress.total, 1)} color={progressColor} label={t('progress', progress)} />
+      </header>
 
-      <Stack $direction="row" $gap={2}>
-        <Link className="btn btn--primary btn--sm" to={`/tasks/new?projectId=${project.id}`}>
+      <div className="toolbar">
+        <ButtonLink variant="primary" size="sm" to={`/tasks/new?projectId=${project.id}`}>
           {t('newTask')}
-        </Link>
+        </ButtonLink>
         {canEdit && (
-          <Button size="sm" onClick={() => void updateProject({ id: project.id, changes: { name: promptName(project.name) } })}>
+          <Button size="sm" onClick={handleRename}>
             {t('rename')}
           </Button>
         )}
@@ -77,24 +108,19 @@ export function ProjectDetailsPage() {
           </Button>
         )}
         {canArchive(myRole) && (
-          <Button
-            size="sm"
-            variant="danger"
-            onClick={() => {
-              navigate('/projects', { replace: true });
-              void deleteProject(project.id);
-            }}
-          >
+          <Button size="sm" variant="danger" onClick={() => void handleDelete()}>
             {t('delete')}
           </Button>
         )}
-      </Stack>
+      </div>
 
       <section aria-labelledby="project-tasks">
-        <h2 id="project-tasks">{t('tasks')}</h2>
-        <div className="board">
+        <h2 id="project-tasks" className={styles.sectionTitle}>
+          {t('tasks')}
+        </h2>
+        <div className={styles.board}>
           {TASK_STATUSES.map((status) => (
-            <div key={status} className="board__column">
+            <div key={status} className={styles.column}>
               <h3>
                 {t(`common:status.${status}`)} ({tasksByStatus[status].length})
               </h3>
@@ -110,14 +136,11 @@ export function ProjectDetailsPage() {
         </div>
       </section>
 
-      <MembersPanel projectId={project.id} members={members} myRole={myRole} canManage={canManage} />
-      <ActivityFeed kind="project" id={project.id} />
+      <div className={`detail-layout ${styles.people}`}>
+        <MembersPanel projectId={project.id} members={members} myRole={myRole} canManage={canManage} />
+        <ActivityFeed kind="project" id={project.id} />
+      </div>
+      <ConfirmDialog ref={confirmDialog} />
     </article>
   );
-}
-
-/** window.prompt keeps the demo small; a real app would use an inline edit (see TaskCard's title editing). */
-function promptName(current: string): string {
-  const answer = window.prompt('Project name', current);
-  return answer?.trim() || current;
 }

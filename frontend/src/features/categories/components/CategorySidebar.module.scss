@@ -1,20 +1,41 @@
 @use '@styles/abstracts' as *;
 
-// A horizontal, wrapping list of category links (19.11). React-only structure: a CSS Module (07.07).
+// A horizontal, wrapping list of category chips with their counts (19.11). React-only structure: a CSS Module.
 .list {
   display: flex;
   flex-wrap: wrap;
-  gap: space(2) space(4);
-  margin: 0 0 space(4);
+  align-items: center;
+  gap: space(2);
+  margin: 0;
   padding: 0;
   list-style: none;
 
   a {
+    display: inline-flex;
+    align-items: center;
+    gap: space(1.5);
+    padding: space(1) space(2.5) space(1) space(1);
+    border: 1.5px solid theme('border');
+    border-radius: $radius-full;
+    color: theme('text');
+    font-size: to-rem(13px);
     text-decoration: none;
+
+    &:hover {
+      border-color: theme('ink');
+    }
   }
 
+  // "All categories" has no chip inside: give it the same height.
+  li:first-child a {
+    padding: space(1) space(3);
+    font-weight: $font-weight-medium;
+  }
+
+  // The selected category: inked outline + the lamp tint.
   a[aria-current='true'] {
-    font-weight: 700;
-    text-decoration: underline;
+    border-color: theme('ink');
+    background: theme('primary-soft');
+    font-weight: $font-weight-semibold;
   }
 }

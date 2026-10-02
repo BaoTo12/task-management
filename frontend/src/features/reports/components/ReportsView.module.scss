@@ -1,0 +1,30 @@
+@use '@styles/abstracts' as *;
+
+// The reports screen. React-only: a CSS Module.
+.reports {
+  display: flex;
+  flex-direction: column;
+  gap: space(3);
+
+  > h2 {
+    margin: space(6) 0 space(1);
+  }
+
+  label {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: space(2);
+    font-size: to-rem(14px);
+    color: theme('text-muted');
+  }
+}
+
+.stats {
+  margin: space(3) 0 0;
+  padding: space(4) space(5);
+  background: theme('surface');
+  border: 1.5px solid theme('border');
+  border-radius: $radius-lg;
+  font-size: to-rem(15px);
+}

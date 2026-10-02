@@ -37,7 +37,7 @@ const toneStyles = {
     border-left-color: ${({ theme }) => theme.colors.danger};
   `,
   info: css`
-    border-left-color: ${({ theme }) => theme.colors.primary};
+    border-left-color: ${({ theme }) => theme.colors.lamp};
   `,
 } satisfies Record<ToastTone, ReturnType<typeof css>>;
 
@@ -48,10 +48,11 @@ const Item = styled.div<{ $tone: ToastTone }>`
   padding: ${({ theme }) => `${theme.space(3)} ${theme.space(4)}`};
   background: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.text};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  /* Inked outline + sticker shadow (like a lifted card); the thick left edge carries the tone. */
+  border: 1.5px solid ${({ theme }) => theme.colors.ink};
   border-left-width: 4px;
   border-radius: ${({ theme }) => theme.radii.md};
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  box-shadow: ${({ theme }) => theme.shadows.ink};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   animation: ${slideIn} 200ms ease-out;
 

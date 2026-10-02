@@ -21,7 +21,7 @@ const Fieldset = styled.fieldset`
   gap: ${({ theme }) => theme.space(4)};
   margin: 0;
   padding: ${({ theme }) => theme.space(3)} ${({ theme }) => theme.space(4)};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1.5px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.md};
 
   legend {
@@ -32,7 +32,7 @@ const Fieldset = styled.fieldset`
   label {
     display: inline-flex;
     align-items: center;
-    gap: ${({ theme }) => theme.space(1)};
+    gap: ${({ theme }) => theme.space(2)};
   }
 `;
 
@@ -89,7 +89,7 @@ export function SettingsPage() {
     <>
       <h1 className="page__title">{t('settings.title')}</h1>
       {/* key: after a language change the defaults below are re-read (an uncontrolled form ignores new defaultValues) */}
-      <form key={i18n.resolvedLanguage} action={formAction} className="form" noValidate>
+      <form key={i18n.resolvedLanguage} action={formAction} className="form panel form--panel" noValidate>
         <Fieldset>
           <legend>{t('settings.theme')}</legend>
           {THEME_PREFERENCES.map((option) => (

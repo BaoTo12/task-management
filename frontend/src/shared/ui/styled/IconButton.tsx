@@ -14,9 +14,14 @@ export const IconButton = styled(StyledButton).attrs<{ label: string }>(({ label
   title: label,
 }))`
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   padding: 0;
   font-size: ${({ theme }) => theme.fontSizes.md};
   line-height: 1;
+
+  svg {
+    width: 19px;
+    height: 19px;
+  }
 `;

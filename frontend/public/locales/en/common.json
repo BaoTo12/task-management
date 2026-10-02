@@ -11,7 +11,9 @@
     "skip": "Skip to content",
     "projects": "Projects",
     "reports": "Reports",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
   },
   "language": {
     "label": "Language",
@@ -32,12 +34,17 @@
     "checking": "Checking your session…",
     "title": "Log in",
     "username": "Username",
-    "usernameHelp": "Demo accounts are listed in the mock API's db.seed.json (e.g. alice).",
+    "usernameHelp": "Trying it out? Log in as alice with the password alice123.",
     "password": "Password",
     "submit": "Log in",
     "submitting": "Logging in…",
     "missing": "Enter your username and password.",
-    "sessionExpired": "Your session has expired. Please log in again."
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "greeting": "Hi, I'm Flo.",
+    "pitch": "Log in and I'll keep an eye on your tasks.",
+    "lead": "Use your TaskFlow account to see your tasks and projects.",
+    "mascotLabel": "Flo, the TaskFlow droid",
+    "mascotName": "droid"
   },
   "notFound": {
     "title": "Page not found",
@@ -56,6 +63,8 @@
   },
   "loading": "Loading…",
   "tryAgain": "Try again",
+  "progressRing": "{{percent}}% of tasks done",
+  "priorityBar": "Priority: {{priority}}",
   "toasts": {
     "created": "Created: {{title}}",
     "saved": "Saved: {{title}}",

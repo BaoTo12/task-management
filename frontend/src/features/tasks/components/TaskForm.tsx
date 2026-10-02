@@ -63,7 +63,7 @@ export function TaskForm({ initialValues, mode, onSubmit, onCancel }: TaskFormPr
   return (
     <form
       ref={formRef}
-      className="form"
+      className="form panel form--panel"
       noValidate
       onSubmit={handleSubmit}
       aria-label={mode === 'create' ? t('form.newTitle') : t('form.editTitle')}

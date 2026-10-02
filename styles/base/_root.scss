@@ -8,13 +8,9 @@
   }
 }
 
-// 0. Theme-independent tokens shared with JavaScript (styled-components, S10):
-//    --color-status-<status>-bg / -fg and --color-priority-<priority>
+// 0. Theme-independent tokens shared with JavaScript (styled-components, S10): --color-priority-<priority>.
+//    (--color-status-<status>-bg / -fg are THEMED: they come with each theme below.)
 :root {
-  @each $status, $colors in $status-colors {
-    --color-status-#{$status}-bg: #{map.get($colors, 'bg')};
-    --color-status-#{$status}-fg: #{map.get($colors, 'fg')};
-  }
   @each $priority, $color in $priority-colors {
     --color-priority-#{$priority}: #{$color};
   }

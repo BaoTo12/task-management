@@ -1,0 +1,44 @@
+@use '@styles/abstracts' as *;
+
+// The task details page. React-only: a CSS Module. (detail-head / detail-layout: styles/layout/_page-parts.scss.)
+
+// The priority <select> sits at the right end of the badges row.
+.priority {
+  display: inline-flex;
+  align-items: center;
+  gap: space(2);
+  margin-left: auto;
+  font-size: to-rem(14px);
+}
+
+.description {
+  margin: 0;
+  font-size: to-rem(16px);
+  line-height: 1.65;
+  max-width: 68ch;
+  white-space: pre-wrap;
+}
+
+.placement {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: space(2) space(4);
+  margin: 0;
+  font-size: to-rem(14px);
+
+  dt {
+    color: theme('text-muted');
+  }
+
+  dd {
+    margin: 0;
+    font-weight: $font-weight-medium;
+    overflow-wrap: anywhere;
+  }
+}
+
+.due {
+  margin: 0;
+  font-size: to-rem(14px);
+  color: theme('text-muted');
+}

@@ -3,8 +3,9 @@ import styled from 'styled-components';
 type AvatarSize = 'sm' | 'md' | 'lg';
 const SIZE_PX: Record<AvatarSize, number> = { sm: 24, md: 32, lg: 48 };
 
-// A fixed palette: colours come from OUR list, never from user input (see 10.10).
-const PALETTE = ['#4f46e5', '#0891b2', '#16a34a', '#ca8a04', '#dc2626', '#9333ea'] as const;
+// A fixed palette: colours come from OUR list, never from user input (see 10.10). The "Lamp & ink" hues
+// (styles/abstracts/_variables.scss), each dark enough for white initials (≥ 4.5:1).
+const PALETTE = ['#9a5600', '#ce2c31', '#218358', '#1b6f68', '#5f6570', '#3a3f48'] as const;
 
 function colorFor(name: string): string {
   let hash = 0;
@@ -28,9 +29,9 @@ const Circle = styled.span<{ $size: number; $color: string }>`
   height: ${({ $size }) => $size}px;
   border-radius: 50%;
   background: ${({ $color }) => $color};
-  color: #fff;
+  color: ${({ theme }) => theme.colors.onInk};
   font-size: ${({ $size }) => Math.round($size * 0.4)}px;
-  font-weight: 600;
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
   user-select: none;
 `;
 

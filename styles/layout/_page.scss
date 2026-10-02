@@ -1,42 +1,59 @@
 @use '../abstracts' as *;
 
 // Cascade layer (03.17): see main.scss for the order.
+// `.page*` is the JSP Admin Portal's shell (header.jspf / footer.jspf). The React app has its own shell
+// (frontend/src/app/AppLayout.tsx + app/shell/) and only shares `.page__title` and `.task-grid` from here.
 @layer layout {
   .page {
     display: grid;
     grid-template-rows: auto 1fr auto;
     min-height: 100vh;
 
+    // The JSP header: a graphite band like the React app's sidebar. It WRAPS, so nothing overlaps on narrow screens.
     &__header {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: space(6);
-      padding: space(3) space(6);
-      background: theme('surface');
-      border-bottom: 1px solid theme('border');
+      gap: space(2) space(6);
+      padding: space(3) space(4);
+      background: theme('rail');
+      color: theme('rail-text');
+
+      @include respond-to('md') {
+        padding: space(3) space(6);
+      }
     }
 
-    // Fluid type (03.17 clamp()): grows with the viewport between 1.5rem and 2rem, no media queries needed.
-    // Replaces what used to take a respond-to() per breakpoint.
+    // Fluid type (03.17 clamp()): grows with the viewport between 1.6rem and 2.25rem, no media queries needed.
     &__title {
-      margin: 0 0 space(6);
-      font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
-      line-height: 1.2;
+      margin: 0 0 space(5);
+      font-family: $font-family-display;
+      font-size: clamp(1.6rem, 1.25rem + 1.4vw, 2.25rem);
+      font-weight: $font-weight-bold;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      overflow-wrap: anywhere;
+
+      .text-muted {
+        font-weight: $font-weight-medium;
+      }
     }
 
     &__brand {
-      font-weight: $font-weight-semibold;
-      font-size: to-rem(18px);
-      color: theme('primary');
+      font-family: $font-family-display;
+      font-weight: $font-weight-bold;
+      font-size: to-rem(19px);
+      color: theme('on-rail');
     }
 
     &__nav {
       display: flex;
-      gap: space(4);
+      flex-wrap: wrap;
+      gap: space(1) space(4);
     }
 
     &__nav-link {
-      color: theme('text-muted');
+      color: theme('rail-muted');
       text-decoration: none;
       font-size: to-rem(14px);
       font-weight: $font-weight-medium;
@@ -44,41 +61,38 @@
       border-bottom: 2px solid transparent;
 
       &:hover {
-        color: theme('text');
+        color: theme('on-rail');
       }
 
       &--active {
-        color: theme('text');
-        border-bottom-color: theme('primary');
+        color: theme('on-rail');
+        border-bottom-color: theme('lamp');
       }
     }
 
     &__main {
       width: 100%;
-      max-width: 1100px;
+      max-width: 1180px;
       margin: 0 auto;
-      padding: space(8) space(6);
+      padding: space(6) space(4);
+
+      @include respond-to('md') {
+        padding: space(8) space(8);
+      }
     }
 
     &__footer {
       padding: space(4) space(6);
       color: theme('text-muted');
-      font-size: to-rem(14px);
+      font-size: to-rem(13px);
       text-align: center;
     }
   }
 
+  // Task cards: as many 280px+ columns as fit, so the grid never overflows (phone: 1 column, wide desktop: 3–4).
   .task-grid {
     display: grid;
     gap: space(4);
-    grid-template-columns: 1fr;
-
-    @include respond-to('md') {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @include respond-to('lg') {
-      grid-template-columns: repeat(3, 1fr);
-    }
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   }
 }

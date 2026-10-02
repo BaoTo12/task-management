@@ -20,14 +20,15 @@ export interface ConfirmDialogHandle {
 const Dialog = styled.dialog`
   max-width: min(420px, calc(100vw - 32px));
   padding: ${({ theme }) => theme.space(5)};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  /* An inked sticker, like a lifted card: the dialog is the one thing to deal with right now. */
+  border: 1.5px solid ${({ theme }) => theme.colors.ink};
   border-radius: ${({ theme }) => theme.radii.lg};
   background: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.text};
-  box-shadow: ${({ theme }) => theme.shadows.md};
+  box-shadow: ${({ theme }) => theme.shadows.ink};
 
   &::backdrop {
-    background: color-mix(in srgb, black 40%, transparent);
+    background: ${({ theme }) => theme.colors.scrim};
   }
 
   h2 {

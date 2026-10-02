@@ -1,0 +1,66 @@
+@use '@styles/abstracts' as *;
+
+// The inbox. React-only: a CSS Module.
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: space(5) 0;
+  padding: 0;
+  list-style: none;
+  background: theme('surface');
+  border: 1.5px solid theme('border');
+  border-radius: $radius-lg;
+  overflow: hidden;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: space(1) space(3);
+  padding: space(4) space(5);
+  border-bottom: 1px solid theme('border');
+  font-size: to-rem(14px);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  time {
+    margin-left: auto;
+    font-size: to-rem(13px);
+  }
+}
+
+// Unread: the lamp on the left edge, like the active page in the sidebar.
+.unread {
+  position: relative;
+  background: theme('primary-soft');
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: space(4);
+    bottom: space(4);
+    left: 0;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: theme('lamp');
+  }
+}
+
+.settings {
+  margin-top: space(5);
+  padding: space(4) space(5);
+  background: theme('surface');
+  border: 1.5px solid theme('border');
+  border-radius: $radius-lg;
+
+  &[open] summary {
+    margin-bottom: space(3);
+  }
+}

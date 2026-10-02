@@ -10,7 +10,7 @@
     "list": "Danh sách",
     "board": "Bảng"
   },
-  "newTask": "+ Công việc mới",
+  "newTask": "Công việc mới",
   "clearCompleted": "Xoá việc đã xong ({{count}})",
   "clearConfirm_other": "Xoá {{count}} công việc đã hoàn thành? $t(common:cannotUndo)",
   "filter": {

@@ -1,3 +1,4 @@
+import { Search } from 'lucide-react';
 import { useId } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,9 +30,10 @@ export function QuickFind() {
       <label className="visually-hidden" htmlFor={id}>
         {t('quickFind.label')}
       </label>
+      <Search className={styles.icon} aria-hidden="true" />
       <input
         id={id}
-        className="form-field__input"
+        className={`form-field__input ${styles.input}`}
         type="search"
         placeholder={t('quickFind.placeholder')}
         autoComplete="off"

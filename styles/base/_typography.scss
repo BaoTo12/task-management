@@ -4,12 +4,125 @@
 @layer base {
   body {
     font-family: $font-family-base;
-    font-size: to-rem(16px);
+    font-size: to-rem(15px);
     color: theme('text');
     background: theme('background');
+    text-rendering: optimizeLegibility;
+  }
+
+  // Headings speak in the display face; body text stays in Be Vietnam Pro.
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: $font-family-display;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    font-weight: $font-weight-bold;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: to-rem(18px);
+  }
+
+  h3 {
+    font-size: to-rem(15px);
   }
 
   a {
     color: theme('primary');
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: theme('primary-hover');
+    }
+  }
+
+  hr {
+    height: 1px;
+    margin: space(6) 0;
+    border: 0;
+    background: theme('border');
+  }
+
+  ::selection {
+    background: theme('primary-soft');
+  }
+
+  // ─── Native controls without a design-system class ───
+  // Many small inline forms (checklists, filters, time entries) use bare <input>/<select>. They get the same look as
+  // .form-field__input here (the same `control` mixin), in the BASE layer, so any component class still wins.
+  // Compact (36px): these sit inside rows of other content.
+  input:not([type='checkbox'], [type='radio'], [type='color'], [type='range'], [type='file'], [type='submit'], [type='button']),
+  select,
+  textarea {
+    @include control(36px);
+  }
+
+  select {
+    max-width: 100%;
+    @include select-chevron;
+  }
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: theme('primary');
+    vertical-align: -3px;
+    cursor: pointer;
+  }
+
+  input[type='color'] {
+    width: 40px;
+    height: 36px;
+    padding: 2px;
+    background: theme('surface');
+    border: 1px solid theme('border-strong');
+    border-radius: $radius-md;
+    cursor: pointer;
+  }
+
+  fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: space(4);
+    border: 1px solid theme('border');
+    border-radius: $radius-lg;
+  }
+
+  legend {
+    padding: 0 space(1);
+    font-size: to-rem(13px);
+    font-weight: $font-weight-semibold;
+    color: theme('text-muted');
+  }
+
+  details > summary {
+    cursor: pointer;
+    font-weight: $font-weight-medium;
+  }
+
+  // Tables (reports, admin pages): readable rows, no default double borders.
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: to-rem(14px);
+  }
+
+  th,
+  td {
+    padding: space(2) space(3);
+    text-align: left;
+    border-bottom: 1px solid theme('border');
+  }
+
+  th {
+    font-size: to-rem(13px);
+    font-weight: $font-weight-semibold;
+    color: theme('text-muted');
   }
 }

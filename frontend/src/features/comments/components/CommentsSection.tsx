@@ -68,7 +68,7 @@ export function CommentsSection({ taskId }: { taskId: number }) {
   }
 
   return (
-    <section className={styles.comments} aria-labelledby={`${fieldId}-heading`}>
+    <section className={`${styles.comments} panel`} aria-labelledby={`${fieldId}-heading`}>
       <h2 id={`${fieldId}-heading`} className={styles.heading}>
         {t('comments.heading')} {isFetching && !isLoading && <span className="text-muted">{t('comments.refreshing')}</span>}
       </h2>

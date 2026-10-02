@@ -80,6 +80,7 @@ describe('Button and ButtonLink (13B.06)', () => {
   it('builds the design-system classes', () => {
     expect(buttonClasses({})).toBe('btn btn--secondary');
     expect(buttonClasses({ variant: 'primary', size: 'sm' }, 'extra')).toBe('btn btn--primary btn--sm extra');
+    expect(buttonClasses({ icon: true })).toBe('btn btn--secondary btn--icon');
   });
 
   it('ButtonLink renders a real link with button classes', () => {

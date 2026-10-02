@@ -4,9 +4,7 @@
   margin-bottom: space(8);
 
   &__title {
-    font-size: to-rem(14px);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: to-rem(15px);
     color: theme('text-muted');
     margin-bottom: space(3);
   }

@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/app/hooks';
 
 import { useErrorMessage } from '@/shared/i18n/useErrorMessage';
-import { Stack } from '@/shared/ui/styled/Stack';
 
 import { useGetProjectsQuery } from '../api/projectsApi';
 import { ProjectCard } from '../components/ProjectCard';
 import { NewProjectForm } from '../components/NewProjectForm';
 import { selectAllProjects } from '../state/projectSelectors';
+
+import styles from './ProjectsPage.module.scss';
 
 /**
  * The query hook SUBSCRIBES (keeps the cache entry alive, gives the status); the selector READS the normalised data.
@@ -22,8 +23,12 @@ export function ProjectsPage() {
 
   return (
     <section>
-      <h1 className="page__title">{t('title')}</h1>
-      <NewProjectForm />
+      <div className="page-head">
+        <h1 className="page__title">{t('title')}</h1>
+      </div>
+      <div className={`panel ${styles.newProject}`}>
+        <NewProjectForm />
+      </div>
       {isLoading && <p className="text-muted">{t('loading')}</p>}
       {error && (
         <p role="alert" className="text-danger">
@@ -31,11 +36,11 @@ export function ProjectsPage() {
         </p>
       )}
       {!isLoading && projects.length === 0 && <p className="text-muted">{t('empty')}</p>}
-      <Stack $gap={3}>
+      <div className={styles.grid}>
         {projects.map((project) => (
           <ProjectCard key={project.id} project={project} />
         ))}
-      </Stack>
+      </div>
     </section>
   );
 }

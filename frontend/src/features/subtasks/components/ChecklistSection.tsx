@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import type { SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -20,6 +20,8 @@ import {
 import { draftClosed, draftStarted, itemMoved, itemRenamed } from '../state/checklistDraft';
 import { selectCanRedoDraft, selectCanUndoDraft, selectChecklistDraft, selectIsEditingChecklist } from '../state/checklistSelectors';
 
+import styles from './ChecklistSection.module.scss';
+
 /**
  * A task's checklist. Two modes:
  *   normal: tick, add, delete, each an RTK Query mutation (ticking is optimistic)
@@ -35,6 +37,7 @@ export function ChecklistSection({ taskId, canEdit }: { taskId: number; canEdit:
   const [deleteSubtask] = useDeleteSubtaskMutation();
   const [reorderSubtasks, reordering] = useReorderSubtasksMutation();
   const [title, setTitle] = useState('');
+  const headingId = useId();
 
   const editing = useAppSelector((state) => selectIsEditingChecklist(state, taskId));
   const draft = useAppSelector(selectChecklistDraft);
@@ -65,14 +68,14 @@ export function ChecklistSection({ taskId, canEdit }: { taskId: number; canEdit:
   }
 
   return (
-    <section aria-labelledby="checklist-title" className="checklist">
-      <h2 id="checklist-title">{t('checklist.title', { done, total: subtasks.length })}</h2>
+    <section aria-labelledby={headingId} className="panel">
+      <h2 id={headingId}>{t('checklist.title', { done, total: subtasks.length })}</h2>
       {subtasks.length > 0 && <Meter value={done} max={subtasks.length} label={t('checklist.progress', { done, total: subtasks.length })} />}
       {isLoading && <p className="text-muted">{t('loading')}</p>}
 
       {editing ? (
         <>
-          <ol>
+          <ol className={styles.items}>
             {draft.items.map((item, index) => (
               <li key={item.id}>
                 <input
@@ -111,9 +114,9 @@ export function ChecklistSection({ taskId, canEdit }: { taskId: number; canEdit:
           </Stack>
         </>
       ) : (
-        <ul className="checklist__items">
+        <ul className={styles.items}>
           {subtasks.map((subtask) => (
-            <li key={subtask.id} className={subtask.done ? 'checklist__item--done' : undefined}>
+            <li key={subtask.id} className={subtask.done ? styles.done : undefined}>
               <label>
                 <input
                   type="checkbox"
@@ -135,7 +138,7 @@ export function ChecklistSection({ taskId, canEdit }: { taskId: number; canEdit:
 
       {canEdit && !editing && (
         <Stack $direction="row" $gap={2}>
-          <form className="form--inline" onSubmit={(event) => void handleAdd(event)}>
+          <form className={`form--inline ${styles.addForm}`} onSubmit={(event) => void handleAdd(event)}>
             <input aria-label={t('checklist.new')} value={title} onChange={(event) => setTitle(event.target.value)} maxLength={200} />
             <Button size="sm" type="submit" disabled={adding.isLoading}>
               {t('checklist.add')}

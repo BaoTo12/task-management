@@ -1,0 +1,62 @@
+@use '@styles/abstracts' as *;
+
+// The task list page. React-only: a CSS Module. (Page head and toolbar come from styles/layout/_page-parts.scss.)
+
+// The filter panel: search, categories, status, project/label.
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: space(4);
+  margin: space(5) 0 space(6);
+  padding: space(4);
+  background: theme('surface');
+  border: 1.5px solid theme('border');
+  border-radius: $radius-lg;
+
+  @include respond-to('md') {
+    padding: space(5);
+  }
+
+  label {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: space(2);
+    font-size: to-rem(14px);
+    color: theme('text-muted');
+  }
+
+  select {
+    min-width: 10rem;
+    color: theme('text');
+  }
+}
+
+// "N/M tasks done" next to the progress ring.
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: space(4);
+}
+
+.summaryText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-family: $font-family-display;
+    font-size: to-rem(20px);
+    line-height: 1.1;
+  }
+
+  span {
+    color: theme('text-muted');
+    font-size: to-rem(14px);
+  }
+}
+
+.pager {
+  margin-top: space(6);
+}

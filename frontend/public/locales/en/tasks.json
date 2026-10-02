@@ -11,7 +11,7 @@
     "list": "List",
     "board": "Board"
   },
-  "newTask": "+ New task",
+  "newTask": "New task",
   "clearCompleted": "Clear completed ({{count}})",
   "clearConfirm_one": "Delete {{count}} completed task? $t(common:cannotUndo)",
   "clearConfirm_other": "Delete {{count}} completed tasks? $t(common:cannotUndo)",

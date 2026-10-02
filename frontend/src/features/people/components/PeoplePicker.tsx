@@ -3,8 +3,11 @@ import { useTranslation } from 'react-i18next';
 
 import type { UserSummary } from '@/shared/domain/types';
 import { useDebounce } from '@/shared/hooks/useDebounce';
+import { Button } from '@/shared/ui/Button';
 
 import { useLazySearchUsersQuery } from '../api/usersApi';
+
+import styles from './PeoplePicker.module.scss';
 
 interface PeoplePickerProps {
   label: string;
@@ -30,24 +33,23 @@ export function PeoplePicker({ label, exclude = [], onPick }: PeoplePickerProps)
 
   const options = found.filter((user) => !exclude.includes(user.id));
   return (
-    <div className="people-picker">
+    <div className={styles.picker}>
       <label htmlFor={inputId}>{label}</label>
       <input id={inputId} type="search" value={text} onChange={(event) => setText(event.target.value)} autoComplete="off" />
       {isFetching && <span className="text-muted">{t('loading')}</span>}
       {debounced.length > 0 && !isFetching && options.length === 0 && <p className="text-muted">{t('people.noMatch')}</p>}
-      <ul className="people-picker__results">
+      <ul className={styles.results}>
         {options.map((user) => (
           <li key={user.id}>
-            <button
-              type="button"
-              className="btn btn--sm btn--secondary"
+            <Button
+              size="sm"
               onClick={() => {
                 onPick(user);
                 setText('');
               }}
             >
               {user.displayName} <span className="text-muted">@{user.username}</span>
-            </button>
+            </Button>
           </li>
         ))}
       </ul>

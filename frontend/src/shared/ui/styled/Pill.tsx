@@ -7,7 +7,8 @@ import type { DefaultTheme, RuleSet } from 'styled-components';
  * - one `css` map per axis;
  * - COMPOUND variants for the combinations the axes can't express alone.
  */
-export type PillTone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger';
+/** 'lamp' is the bright amber: for pills on the graphite rail, where 'primary' (dark amber) would be too dim. */
+export type PillTone = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'lamp';
 export type PillAppearance = 'soft' | 'solid' | 'outline';
 
 const toneColor = (theme: DefaultTheme, tone: PillTone): string =>
@@ -17,6 +18,7 @@ const toneColor = (theme: DefaultTheme, tone: PillTone): string =>
     success: theme.colors.success,
     warning: theme.colors.warning,
     danger: theme.colors.danger,
+    lamp: theme.colors.lamp,
   })[tone];
 
 type PillProps = { $tone?: PillTone; $appearance?: PillAppearance };

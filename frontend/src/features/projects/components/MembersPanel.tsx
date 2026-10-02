@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from '@/features/auth';
@@ -12,6 +13,8 @@ import { Button } from '@/shared/ui/Button';
 import { usePutMemberMutation, useRemoveMemberMutation } from '../api/projectsApi';
 import { assignableRoles } from '../model/permissions';
 import type { MemberRow } from '../state/projectSelectors';
+
+import styles from './MembersPanel.module.scss';
 
 interface MembersPanelProps {
   projectId: number;
@@ -28,18 +31,19 @@ export function MembersPanel({ projectId, members, myRole, canManage }: MembersP
   const [putMember, putState] = usePutMemberMutation();
   const [removeMember, removeState] = useRemoveMemberMutation();
   const roles = assignableRoles(myRole);
+  const headingId = useId();
 
   function changeRole(userId: number, value: string) {
     if (isOneOf(PROJECT_ROLES, value)) void putMember({ projectId, userId, role: value });
   }
 
   return (
-    <section aria-labelledby="members-title">
-      <h2 id="members-title">{t('membersTitle', { count: members.length })}</h2>
-      <ul className="members">
+    <section aria-labelledby={headingId} className="panel">
+      <h2 id={headingId}>{t('membersTitle', { count: members.length })}</h2>
+      <ul className={styles.members}>
         {members.map((member) => (
           <li key={member.userId}>
-            <span>{member.person?.displayName ?? `#${member.userId}`}</span>{' '}
+            <span className={styles.name}>{member.person?.displayName ?? `#${member.userId}`}</span>{' '}
             {canManage && member.userId !== user?.id ? (
               <select
                 aria-label={t('roleOf', { name: member.person?.displayName ?? member.userId })}

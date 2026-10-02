@@ -23,6 +23,8 @@
   "archive": "Archive",
   "unarchive": "Unarchive",
   "delete": "Delete project",
+  "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+  "renamePrompt": "New name for the project",
   "tasks": "Tasks",
   "form": {
     "name": "Name",

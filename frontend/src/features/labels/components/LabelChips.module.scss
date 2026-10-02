@@ -1,0 +1,8 @@
+@use '@styles/abstracts' as *;
+
+// A task's labels as a wrapping row of tags. React-only: a CSS Module.
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: space(1.5);
+}

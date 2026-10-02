@@ -1,0 +1,55 @@
+@use '@styles/abstracts' as *;
+
+// One project. React-only: a CSS Module. (detail-head / detail-layout: styles/layout/_page-parts.scss.)
+
+.sectionTitle {
+  margin: space(8) 0 space(4);
+  font-size: to-rem(20px);
+}
+
+// The project's tasks by status: three columns of titles (they wrap to one column on narrow screens).
+.board {
+  display: grid;
+  gap: space(3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.column {
+  padding: space(4);
+  background: theme('surface-muted');
+  border-radius: $radius-lg;
+
+  h3 {
+    margin: 0 0 space(3);
+    font-size: to-rem(14px);
+    color: theme('text-muted');
+  }
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: space(2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li a {
+    display: block;
+    padding: space(2) space(3);
+    border: 1.5px solid theme('border');
+    border-radius: $radius-md;
+    background: theme('surface');
+    color: theme('text');
+    font-size: to-rem(14px);
+    text-decoration: none;
+
+    &:hover {
+      border-color: theme('ink');
+    }
+  }
+}
+
+.people {
+  margin-top: space(8);
+}

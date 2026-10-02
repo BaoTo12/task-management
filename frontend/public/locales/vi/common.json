@@ -11,7 +11,9 @@
     "skip": "Bỏ qua đến nội dung",
     "projects": "Dự án",
     "reports": "Báo cáo",
-    "notifications": "Thông báo"
+    "notifications": "Thông báo",
+    "menu": "Menu",
+    "closeMenu": "Đóng menu"
   },
   "language": {
     "label": "Ngôn ngữ",
@@ -32,12 +34,17 @@
     "checking": "Đang kiểm tra phiên đăng nhập…",
     "title": "Đăng nhập",
     "username": "Tên đăng nhập",
-    "usernameHelp": "Các tài khoản mẫu nằm trong db.seed.json của mock API (ví dụ: alice).",
+    "usernameHelp": "Muốn dùng thử? Đăng nhập bằng alice, mật khẩu alice123.",
     "password": "Mật khẩu",
     "submit": "Đăng nhập",
     "submitting": "Đang đăng nhập…",
     "missing": "Hãy nhập tên đăng nhập và mật khẩu.",
-    "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
+    "sessionExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+    "greeting": "Chào bạn, mình là Flo.",
+    "pitch": "Đăng nhập đi, mình sẽ để mắt tới công việc của bạn.",
+    "lead": "Dùng tài khoản TaskFlow để xem công việc và dự án của bạn.",
+    "mascotLabel": "Flo, chú robot của TaskFlow",
+    "mascotName": "robot Flo"
   },
   "notFound": {
     "title": "Không tìm thấy trang",
@@ -56,6 +63,8 @@
   },
   "loading": "Đang tải…",
   "tryAgain": "Thử lại",
+  "progressRing": "Đã hoàn thành {{percent}}% công việc",
+  "priorityBar": "Độ ưu tiên: {{priority}}",
   "toasts": {
     "created": "Đã tạo: {{title}}",
     "saved": "Đã lưu: {{title}}",

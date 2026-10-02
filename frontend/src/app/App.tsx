@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, Route, Routes } from 'react-router';
 
 import { LoginPage, RequireAuth } from '@/features/auth';
@@ -21,19 +22,22 @@ const DashboardPage = lazy(() =>
 // anyway: classic code has no injection mechanism, which is one of the things MIGRATION.md fixes.)
 const ReportsPage = lazy(() => import('@/features/reports').then((module) => ({ default: module.ReportsPage })));
 
-const pageFallback = (
-  <LoadingBlock>
-    <Spinner aria-label="Loading" />
-  </LoadingBlock>
-);
-
 export function App() {
+  const { t } = useTranslation();
+  // One fallback for every lazy page: the chunk is downloading.
+  const pageFallback = (
+    <LoadingBlock>
+      <Spinner aria-label={t('loading')} />
+    </LoadingBlock>
+  );
+
   return (
     <Routes>
+      {/* The login page has its own full-screen layout (the mascot), outside the app shell. */}
+      <Route path="login" element={<LoginPage />} />
       <Route element={<AppLayout />}>
-        <Route path="login" element={<LoginPage />} />
         <Route element={<RequireAuth />}>
-          {/* replace on both navigations means the redirect doesn't add an entry to the browser histor */}
+          {/* replace on both navigations means the redirect doesn't add an entry to the browser history */}
           <Route index element={<Navigate to="/tasks" replace />} />
           <Route path="tasks" element={<TasksPage />} />
           <Route path="tasks/new" element={<NewTaskPage />} />
@@ -54,13 +58,7 @@ export function App() {
           <Route
             path="dashboard"
             element={
-              <Suspense
-                fallback={
-                  <LoadingBlock>
-                    <Spinner aria-label="Loading dashboard" />
-                  </LoadingBlock>
-                }
-              >
+              <Suspense fallback={pageFallback}>
                 <DashboardPage />
               </Suspense>
             }

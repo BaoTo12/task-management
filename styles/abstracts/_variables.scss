@@ -1,34 +1,58 @@
 // ─── Raw palette (compile-time; referenced by the theme maps in _tokens.scss) ───
+// "Lamp & ink": taken from the login mascot, a droid with a white shell, a graphite visor band and one amber lamp
+// for an eye. Graphite and steel neutrals carry the interface; AMBER is the single signal colour ("this needs you").
 $palette: (
-  'indigo-400': #818cf8,
-  'indigo-600': #4f46e5,
-  'red-400': #f87171,
-  'red-600': #dc2626,
-  'slate-50': #f8fafc,
-  'slate-100': #f1f5f9,
-  'slate-200': #e2e8f0,
-  'slate-400': #94a3b8,
-  'slate-500': #64748b,
-  'slate-700': #334155,
-  'slate-800': #1e293b,
-  'slate-900': #0f172a,
+  'graphite-950': #0d0f12,
+  'graphite-900': #15171b,
+  'graphite-850': #1a1d22,
+  'graphite-800': #1f2126,
+  'graphite-750': #22262c,
+  'graphite-700': #2c3037,
+  'graphite-650': #3a3f48,
+  'steel-500': #5f6570,
+  'steel-400': #858b95,
+  'steel-300': #a2a8b2,
+  'steel-200': #c3c8cf,
+  'steel-150': #dfe2e6,
+  'steel-100': #eef0f2,
+  'shell': #f6f7f8,
   'white': #ffffff,
+  'lamp-300': #f7b955,
+  'lamp-400': #f5a524,
+  'lamp-500': #e0911a,
+  'lamp-700': #9a5600,
+  'signal-400': #f2777a,
+  'signal-500': #e5484d,
+  'signal-600': #ce2c31,
+  'green-400': #4cc38a,
+  'green-600': #218358,
 );
 
 // ─── Scales ───
 $base-font-size: 16px !default;
 $space-unit: 4px !default;
 
-$radius-sm: 4px;
-$radius-md: 6px;
-$radius-lg: 8px;
+// Radius follows hierarchy, not one value for everything: controls are tight, surfaces softer, chips round.
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 18px;
 $radius-full: 999px;
 
-$shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-$shadow-md: 0 1px 3px rgba(15, 23, 42, 0.1), 0 1px 2px rgba(15, 23, 42, 0.06);
+// Shadows are rare: surfaces are separated by INKED outlines (like the droid's line art). The offset "ink" shadow is
+// for the few things that should feel like a sticker you could pick up (a hovered card, the login panel).
+$shadow-sm: 0 1px 2px rgba(31, 33, 38, 0.06);
+$shadow-md: 0 6px 20px rgba(31, 33, 38, 0.1);
+$shadow-ink: 3px 3px 0 var(--color-ink);
 
-$font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+// Self-hosted (@fontsource, imported by the React app): no CDN request, so the WAR's strict CSP keeps working.
+// Be Vietnam Pro for text: drawn for Vietnamese diacritics, the app's second language. Bricolage Grotesque for
+// headings: a lively grotesque with ink-trap-like joins that echoes the mascot's cartoon line. The JSP pages fall
+// back to the system stack.
+$font-family-base: 'Be Vietnam Pro', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+$font-family-display: 'Bricolage Grotesque Variable', 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif;
 $font-weight-medium: 500;
 $font-weight-semibold: 600;
+$font-weight-bold: 700;
 
-$transition-fast: 150ms ease;
+$transition-fast: 150ms cubic-bezier(0.2, 0, 0, 1);

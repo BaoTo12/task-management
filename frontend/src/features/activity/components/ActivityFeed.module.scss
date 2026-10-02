@@ -1,0 +1,39 @@
+@use '@styles/abstracts' as *;
+
+// A feed as a thin timeline: each entry hangs from a line on the left. React-only: a CSS Module.
+// The surface is the design system's .panel.
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: to-rem(14px);
+
+  li {
+    position: relative;
+    padding: 0 0 space(3) space(5);
+    border-left: 1.5px solid theme('border');
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: -5px;
+      width: 8px;
+      height: 8px;
+      border: 1.5px solid theme('ink');
+      border-radius: 50%;
+      background: theme('surface');
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    time {
+      display: block;
+      font-size: to-rem(12px);
+    }
+  }
+}

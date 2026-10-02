@@ -1,0 +1,13 @@
+@use '@styles/abstracts' as *;
+
+// The project list. React-only: a CSS Module.
+.newProject {
+  margin-bottom: space(6);
+}
+
+// As many 300px+ cards per row as fit (phone: one column).
+.grid {
+  display: grid;
+  gap: space(4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}

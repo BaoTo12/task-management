@@ -29,12 +29,13 @@ import { ButtonLink } from '@/shared/ui/ButtonLink';
 import { ConfirmDialog } from '@/shared/ui/ConfirmDialog';
 import type { ConfirmDialogHandle } from '@/shared/ui/ConfirmDialog';
 import { NotFoundPage } from '@/shared/ui/NotFoundPage';
-import { Stack } from '@/shared/ui/styled/Stack';
 
 import { PriorityBadge, StatusBadge } from '../components/Badge';
 import { PriorityBar } from '../components/PriorityBar';
 import { backToListHref, parseTaskId } from '../model/list-link';
 import { canEditTask } from '../model/task-access';
+
+import styles from './TaskDetailsPage.module.scss';
 
 export function TaskDetailsPage() {
   const { id: rawId } = useParams();
@@ -98,57 +99,73 @@ export function TaskDetailsPage() {
   return (
     <article>
       <Breadcrumbs label={t('details.breadcrumb')} items={[{ label: t('title'), to: backHref }, { label: task.title }]} />
-      <h1 className="page__title">{task.title}</h1>
-      <Stack $direction="row" $gap={2} $align="center">
-        <StatusBadge status={task.status} />
-        <PriorityBadge priority={task.priority} />
-        <PriorityBar priority={task.priority} />
-        {user && (
-          <label className="text-muted">
-            {t('details.priority')}{' '}
-            <select value={task.priority} onChange={(e) => handlePriority(e.target.value)}>
-              {PRIORITIES.map((priority) => (
-                <option key={priority} value={priority}>
-                  {t(`common:priority.${priority}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-      </Stack>
-            {/* `[label](url)` links become SafeLinks (26.06); everything else stays text. */}
-      <p>{task.description ? <LinkifiedText text={task.description} /> : <span className="text-muted">{t('details.noDescription')}</span>}</p>
-      <p className="text-muted">
-        {t('details.due', { date: task.dueDate ? formatDue(task.dueDate, today, i18n.language) : t('details.noDueDate') })}
-      </p>
-      <Stack $direction="row" $gap={2}>
-        <ButtonLink variant="primary" size="sm" to={`/tasks/${task.id}/edit`} state={location.state}>
-          {t('details.edit')}
-        </ButtonLink>
-        <ButtonLink size="sm" to={backHref}>
-          {t('details.back')}
-        </ButtonLink>
-        {/* Hidden for anonymous users: UX only. The API decides who may delete (12.07). */}
-        {user && (
-          <Button size="sm" variant="danger" onClick={() => void handleDelete()}>
-            {t('details.delete')}
-          </Button>
-        )}
-      </Stack>
-      <dl className="task__placement">
-        <dt>{t('details.project')}</dt>
-        <dd>{project ? <Link to={`/projects/${project.id}`}>{project.name}</Link> : t('form.noProject')}</dd>
-        <dt>{t('details.assignee')}</dt>
-        <dd>
-          <UserName id={task.assigneeId} />
-        </dd>
-      </dl>
-      <LabelChips labelIds={task.labelIds} />
-      <LabelPicker taskId={task.id} labelIds={task.labelIds} canEdit={editable} />
-      <ChecklistSection taskId={task.id} canEdit={editable} />
-      <TimeSection taskId={task.id} canEdit={editable} />
-      <CommentsSection taskId={task.id} />
-      <ActivityFeed kind="task" id={task.id} />
+      <header className="detail-head">
+        <h1 className="page__title">{task.title}</h1>
+        <div className="detail-head__meta">
+          <StatusBadge status={task.status} />
+          <PriorityBadge priority={task.priority} />
+          <PriorityBar priority={task.priority} />
+          <LabelChips labelIds={task.labelIds} />
+          {editable && (
+            <label className={`text-muted ${styles.priority}`}>
+              {t('details.priority')}
+              <select value={task.priority} onChange={(e) => handlePriority(e.target.value)}>
+                {PRIORITIES.map((priority) => (
+                  <option key={priority} value={priority}>
+                    {t(`common:priority.${priority}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
+        <div className="toolbar">
+          {/* UX only, like Delete below: the API decides who may edit. */}
+          {editable && (
+            <ButtonLink variant="primary" size="sm" to={`/tasks/${task.id}/edit`} state={location.state}>
+              {t('details.edit')}
+            </ButtonLink>
+          )}
+          <ButtonLink size="sm" to={backHref}>
+            {t('details.back')}
+          </ButtonLink>
+          {/* Hidden for anonymous users: UX only. The API decides who may delete (12.07). */}
+          {user && (
+            <Button size="sm" variant="danger" onClick={() => void handleDelete()}>
+              {t('details.delete')}
+            </Button>
+          )}
+        </div>
+      </header>
+
+      <div className="detail-layout">
+        <div className="detail-main">
+          {/* `[label](url)` links become SafeLinks (26.06); everything else stays text. */}
+          <p className={styles.description}>
+            {task.description ? <LinkifiedText text={task.description} /> : <span className="text-muted">{t('details.noDescription')}</span>}
+          </p>
+          <ChecklistSection taskId={task.id} canEdit={editable} />
+          <CommentsSection taskId={task.id} />
+        </div>
+        <aside className="detail-side">
+          <div className="panel">
+            <dl className={styles.placement}>
+              <dt>{t('details.project')}</dt>
+              <dd>{project ? <Link to={`/projects/${project.id}`}>{project.name}</Link> : t('form.noProject')}</dd>
+              <dt>{t('details.assignee')}</dt>
+              <dd>
+                <UserName id={task.assigneeId} />
+              </dd>
+            </dl>
+            <p className={styles.due}>
+              {t('details.due', { date: task.dueDate ? formatDue(task.dueDate, today, i18n.language) : t('details.noDueDate') })}
+            </p>
+          </div>
+          <LabelPicker taskId={task.id} labelIds={task.labelIds} canEdit={editable} />
+          <TimeSection taskId={task.id} canEdit={editable} />
+          <ActivityFeed kind="task" id={task.id} />
+        </aside>
+      </div>
       <ConfirmDialog ref={confirmDialog} />
     </article>
   );

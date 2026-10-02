@@ -1,12 +1,28 @@
 @use '@styles/abstracts' as *;
 
+// Phones: the three columns sit side by side and scroll sideways, one column per swipe (scroll snap), instead of
+// stacking into one very long page. From `md` they share the width.
 .board {
   display: grid;
-  gap: space(4);
-  grid-template-columns: 1fr;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 85%);
+  gap: space(3);
+  margin: space(5) calc(-1 * #{space(4)}) 0;
+  padding: 0 space(4) space(2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 space(4);
+
+  > * {
+    scroll-snap-align: start;
+  }
 
   @include respond-to('md') {
-    grid-template-columns: repeat(3, 1fr);
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: space(5) 0 0;
+    padding: 0;
+    overflow: visible;
   }
 }
 
@@ -24,17 +40,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: to-rem(14px);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: theme('text-muted');
+  margin: 0;
+  padding: space(1) space(1) 0;
+  font-size: to-rem(15px);
 }
 
 .count {
-  font-size: to-rem(12px);
-  padding: 0 space(2);
+  min-width: 26px;
+  padding: 1px space(2);
+  border: 1.5px solid theme('border-strong');
   border-radius: $radius-full;
   background: theme('surface');
+  font-family: $font-family-base;
+  font-size: to-rem(12px);
+  font-weight: $font-weight-semibold;
+  text-align: center;
 }
 
 .cards {
@@ -44,6 +64,11 @@
 }
 
 .empty {
+  margin: 0;
+  padding: space(6) space(3);
+  border: 1.5px dashed theme('border-strong');
+  border-radius: $radius-md;
   color: theme('text-muted');
   font-size: to-rem(14px);
+  text-align: center;
 }

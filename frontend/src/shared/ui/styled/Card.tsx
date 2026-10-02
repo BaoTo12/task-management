@@ -14,21 +14,29 @@ export const Card = styled.section<{ $interactive?: boolean; $padding?: number }
   gap: ${({ theme }) => theme.space(3)};
   padding: ${({ theme, $padding = 4 }) => theme.space($padding)};
   background: ${({ theme }) => theme.colors.surface};
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1.5px solid ${({ theme }) => theme.colors.border};
   border-radius: ${({ theme }) => theme.radii.lg};
-  box-shadow: ${({ theme }) => theme.shadows.sm};
 
   ${({ $interactive, theme }) =>
     $interactive &&
     css`
       transition:
         box-shadow ${theme.motion.fast} ${theme.motion.easing},
+        border-color ${theme.motion.fast} ${theme.motion.easing},
         transform ${theme.motion.fast} ${theme.motion.easing};
 
       &:hover,
       &:focus-within {
-        box-shadow: ${theme.shadows.md};
-        transform: translateY(-1px);
+        border-color: ${theme.colors.ink};
+        box-shadow: ${theme.shadows.ink};
+        transform: translate(-1px, -1px);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        &:hover,
+        &:focus-within {
+          transform: none;
+        }
       }
     `}
 `;
@@ -41,12 +49,22 @@ export const CardHeader = styled.header`
 `;
 
 export const CardTitle = styled.h2`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.space(2)};
   margin: 0;
-  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-size: ${({ theme }) => theme.fontSizes.md};
   font-weight: ${({ theme }) => theme.fontWeights.bold};
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: ${({ theme }) => theme.colors.textMuted};
+  color: ${({ theme }) => theme.colors.text};
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
 `;
 
 /**

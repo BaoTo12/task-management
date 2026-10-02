@@ -59,7 +59,7 @@ describe('extending (09.06)', () => {
     const { html, css } = render(<IconButton label="Theme" />);
     expect(html).toContain('aria-label="Theme"');
     expect(html).toContain('type="button"'); // from StyledButton's attrs
-    expect(css).toContain('width:32px'); // IconButton's own rule
+    expect(css).toContain('justify-content:center'); // IconButton's own rule (not a size: sizes change with the design)
     expect(css).toContain('cursor:pointer'); // inherited rule
   });
 });
@@ -89,6 +89,6 @@ describe('CSS injection defence (10.10)', () => {
   it('Tag refuses a colour that is not a plain hex value', () => {
     const { css } = render(<Tag label="x" color="red;} body{display:none" />);
     expect(css).not.toContain('display:none');
-    expect(css).toContain('#64748b'); // the fallback
+    expect(css).toContain('#5f6570'); // the fallback
   });
 });

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import styled, { keyframes } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
@@ -57,11 +58,12 @@ interface ProgressRingProps {
 }
 
 export function ProgressRing({ done, total }: ProgressRingProps) {
+  const { t } = useTranslation();
   const percent = total === 0 ? 0 : Math.round((done / total) * 100);
   const offset = CIRCUMFERENCE * (1 - percent / 100);
 
   return (
-    <Wrapper aria-label={`${percent}% of tasks done`} role="img">
+    <Wrapper aria-label={t('progressRing', { percent })} role="img">
       <svg width={SIZE} height={SIZE} aria-hidden="true">
         <circle
           cx={SIZE / 2}

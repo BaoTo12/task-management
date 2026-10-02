@@ -1,5 +1,51 @@
 @use 'sass:map';
+@use 'variables' as *;
 @use 'tokens' as *;
+@use 'functions' as *;
+
+// The select arrow (lucide "chevron-down"), stroked in steel-400 so it reads in both themes.
+$-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23858b95' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+/// The look EVERY text field and select shares: bare controls (base/_typography) and .form-field__input
+/// (components/_form). One definition, so the two can't drift apart; only the height differs on purpose.
+@mixin control($min-height: 40px) {
+  min-height: $min-height;
+  padding: space(1.5) space(3);
+  font-size: to-rem(14px);
+  line-height: 1.4;
+  color: theme('text');
+  background-color: theme('surface');
+  border: 1px solid theme('border-strong');
+  border-radius: $radius-md;
+  transition:
+    border-color $transition-fast,
+    box-shadow $transition-fast;
+
+  &::placeholder {
+    color: theme('text-muted');
+  }
+
+  &:focus {
+    outline: none;
+    border-color: theme('primary');
+    box-shadow: 0 0 0 3px theme('focus-ring');
+  }
+
+  &:disabled {
+    background-color: theme('surface-muted');
+    cursor: not-allowed;
+  }
+}
+
+/// A native <select> with our chevron instead of the browser's arrow.
+@mixin select-chevron {
+  appearance: none;
+  padding-right: space(8);
+  background-image: $-chevron;
+  background-repeat: no-repeat;
+  background-position: right space(3) center;
+  cursor: pointer;
+}
 
 /// Mobile-first media query for a named breakpoint.
 @mixin respond-to($breakpoint) {

@@ -29,11 +29,22 @@ const Customize = styled.fieldset`
   display: flex;
   flex-wrap: wrap;
   gap: ${({ theme }) => theme.space(3)};
-  margin: 0 0 ${({ theme }) => theme.space(4)};
-  padding: ${({ theme }) => theme.space(2)} ${({ theme }) => theme.space(3)};
-  border: 1px dashed ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
+  align-items: center;
+  margin: 0 0 ${({ theme }) => theme.space(6)};
+  padding: ${({ theme }) => theme.space(3)} ${({ theme }) => theme.space(4)};
+  border: 1.5px dashed ${({ theme }) => theme.colors.borderStrong};
+  border-radius: ${({ theme }) => theme.radii.lg};
   font-size: ${({ theme }) => theme.fontSizes.sm};
+
+  legend {
+    padding: 0 ${({ theme }) => theme.space(1)};
+  }
+
+  label {
+    display: inline-flex;
+    align-items: center;
+    gap: ${({ theme }) => theme.space(2)};
+  }
 `;
 
 /** How often the dashboard re-asks the server while it is open (other people change tasks too). */

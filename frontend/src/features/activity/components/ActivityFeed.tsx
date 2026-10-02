@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useId, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
@@ -11,6 +11,8 @@ import { Button } from '@/shared/ui/Button';
 import { activityAdapter, loadActivity, selectFeed } from '../state/activitySlice';
 import type { FeedScope } from '../state/activitySlice';
 
+import styles from './ActivityFeed.module.scss';
+
 const { selectAll } = activityAdapter.getSelectors();
 
 /**
@@ -20,6 +22,7 @@ const { selectAll } = activityAdapter.getSelectors();
 export function ActivityFeed({ kind, id = 0 }: { kind: FeedScope['kind']; id?: number }) {
   const { t, i18n } = useTranslation('activity');
   const dispatch = useAppDispatch();
+  const headingId = useId();
   // PRIMITIVE props, one memoized scope object: an object prop would be a new reference every parent render, and the
   // effect below would re-run (and re-fetch) each time.
   const stableScope = useMemo<FeedScope>(() => (kind === 'all' ? { kind } : { kind, id }), [kind, id]);
@@ -32,15 +35,15 @@ export function ActivityFeed({ kind, id = 0 }: { kind: FeedScope['kind']; id?: n
   }, [dispatch, stableScope]);
 
   return (
-    <section aria-labelledby="activity-title" className="activity">
-      <h2 id="activity-title">{t('title')}</h2>
+    <section aria-labelledby={headingId} className="panel">
+      <h2 id={headingId}>{t('title')}</h2>
       {feed?.status === 'failed' && (
         <p role="alert" className="text-danger">
           {feed.error}
         </p>
       )}
       {items.length === 0 && feed?.status === 'succeeded' && <p className="text-muted">{t('empty')}</p>}
-      <ol className="activity__list">
+      <ol className={styles.list}>
         {items.map((entry) => (
           <li key={entry.id}>
             <UserName id={entry.actorId} />{' '}

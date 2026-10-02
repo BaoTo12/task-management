@@ -12,7 +12,8 @@ const SIZE_PX: Record<SpinnerSize, number> = { sm: 16, md: 24, lg: 40 };
  *
  * - `keyframes` (09.07): the animation name is generated and scoped, no global @keyframes clash.
  * - `.attrs()` with a FUNCTION (09.08): accessibility attributes computed from props, so every caller gets
- *   role="status" and a label without remembering to pass them. Callers can still override `aria-label`.
+ *   role="status" and a label without remembering to pass them. Callers pass a translated `aria-label`; the
+ *   English 'Loading' is only for AppProviders' fallback, which renders BEFORE any translation has loaded.
  */
 export const Spinner = styled.span.attrs<{ $size?: SpinnerSize; 'aria-label'?: string }>((props) => ({
   role: 'status',
