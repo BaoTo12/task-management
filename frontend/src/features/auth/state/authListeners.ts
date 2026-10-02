@@ -1,11 +1,7 @@
 import { isAnyOf } from '@reduxjs/toolkit';
-
 import type { AppStartListening } from '@/app/listeners';
-
 import { toastShown } from '@/features/ui';
-
 import { loggedOut, sessionExpired } from '@/shared/session/authActions';
-
 import { authApi } from '../api/authApi';
 import { clearUserData } from './clearUserData';
 
@@ -46,7 +42,7 @@ export function addAuthListeners(startAppListening: AppStartListening) {
     effect: async (_action, listenerApi) => {
       listenerApi.cancelActiveListeners();
       const loop = listenerApi.fork(async (forkApi) => {
-        for (;;) {
+        for (; ;) {
           await forkApi.delay(KEEP_ALIVE_MS);
           if (document.visibilityState !== 'visible') continue; // a hidden tab lets the session idle out
           await listenerApi.dispatch(

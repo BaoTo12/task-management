@@ -6,7 +6,7 @@
 //   utilities                            unlayered on purpose: a utility class must win over a component
 //   React CSS Modules, styled-components unlayered too: app-specific styles override the shared design system
 // Utilities stay outside layers for a second reason: they use @extend, which doesn't mix well with @layer blocks.
-@layer reset, base, layout, components;
+@use 'base/layer';
 
 @use 'base/reset';
 @use 'base/root';

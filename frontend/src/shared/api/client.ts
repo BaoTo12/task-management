@@ -11,7 +11,6 @@ declare module 'axios' {
   }
 }
 
-/** The one Axios instance for TaskFlow's API. Nothing else in the app imports axios directly. */
 export const api = axios.create({
   // '/api' goes through the Vite dev proxy (same origin). Part 3 changes only this line (or the env var).
   baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',

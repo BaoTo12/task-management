@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.UpdateTimestamp;
 
 /**
@@ -51,6 +52,14 @@ public class Task {
   private Priority priority = Priority.MEDIUM;
   @Column(name = "due_date")
   private LocalDate dueDate;
+  /**
+   * 1 when there's no due date, else 0: a read-only column computed by the database (@Formula), used ONLY to sort.
+   * Spring Data's Criteria queries can't say "NULLS LAST", so TaskSort.DUE sorts by this first instead.
+   */
+  @Formula("(case when due_date is null then 1 else 0 end)")
+  @Getter(AccessLevel.NONE)
+  @Setter(AccessLevel.NONE)
+  private int dueDateMissing;
   @Column(name = "category_id")
   private Long categoryId;
   @Column(name = "project_id")

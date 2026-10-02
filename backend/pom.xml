@@ -31,6 +31,8 @@
 
   <properties>
     <java.version>17</java.version>
+    <!-- Empty by default; pass your key on the command line for the security profile: -DnvdApiKey=… -->
+    <nvdApiKey></nvdApiKey>
   </properties>
 
   <dependencies>
@@ -164,7 +166,7 @@
             <path>
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-configuration-processor</artifactId>
-              <version>${spring-boot.version}</version>
+              <version>${project.parent.version}</version>   <!-- the Spring Boot version of <parent> -->
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -182,6 +184,7 @@
               <groupId>org.springframework.boot</groupId>
               <artifactId>spring-boot-configuration-processor</artifactId>
             </exclude>
+          </excludes>
         </configuration>
       </plugin>
     </plugins>

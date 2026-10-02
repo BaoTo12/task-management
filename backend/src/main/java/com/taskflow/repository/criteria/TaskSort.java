@@ -2,7 +2,6 @@ package com.taskflow.repository.criteria;
 
 import java.util.Locale;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.domain.Sort.NullHandling;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.domain.Sort;
 
@@ -40,8 +39,10 @@ public enum TaskSort {
     return switch (this) {
       case ID -> Sort.by(dir, "id");
       case NEWEST -> Sort.by(reversed, "id");
-      // Tasks without a due date stay LAST in both directions.
-      case DUE -> Sort.by(new Order(dir, "dueDate", NullHandling.NULLS_LAST), new Order(dir, "id"));
+      // Tasks without a due date stay LAST in both directions: dueDateMissing (0/1, Task's @Formula) ALWAYS ascending.
+      // Not Order.nullsLast(): Spring Data builds these queries with the Criteria API, which rejects null handling
+      // ("Applying Null Precedence using Criteria Queries is not yet supported").
+      case DUE -> Sort.by(Order.asc("dueDateMissing"), new Order(dir, "dueDate"), new Order(dir, "id"));
       // In the list, "ascending" priority means the most important first: HIGH, MEDIUM, LOW.
       case PRIORITY -> Sort.by(reversed, "priority").and(Sort.by(reversed, "id"));
       case TITLE -> Sort.by(dir, "title").and(Sort.by(dir, "id"));

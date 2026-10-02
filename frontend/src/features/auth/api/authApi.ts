@@ -15,10 +15,6 @@ export interface Credentials {
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (build) => ({
-    /**
-     * GET /auth/me → the user, or `null` when not logged in. A 401 here is an ANSWER ("nobody"), not an error,
-     * so a `queryFn` turns it into data. Other failures (network, 500) stay errors.
-     */
     getMe: build.query<User | null, void>({
       async queryFn(_arg, _api, _extraOptions, baseQuery) {
         const result = await baseQuery({ url: '/auth/me', validate: isUser });

@@ -41,10 +41,7 @@ import { LIST_QUERY, selectTaskById } from '../state/taskSelectors';
 type View = 'list' | 'board';
 
 export function TasksPage() {
-  // The app-wide list (22.09): the progress ring, "Clear completed" and the board read it through selectors.
-  // The same argument as AppLayout's subscription → the same cache entry, no second request (22.02).
   const listResult = useGetTasksQuery(LIST_QUERY);
-  // Namespace 'tasks' loads on first use (25.11); 'common' is always there. Suspense waits for it (main.tsx).
   const { t } = useTranslation(['tasks', 'common']);
   const errorMessage = useErrorMessage();
   // Stable results only (21.05): memoised stats and ids. They read the same cache entry.

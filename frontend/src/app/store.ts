@@ -3,14 +3,13 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 
 import { readListPrefsCookie } from '@/features/listPrefs';
 import { createTimerMiddleware } from '@/features/timeTracking';
-
 import { apiSlice } from '@/shared/api/apiSlice';
 import * as taskflowApi from '@/shared/api/endpoints';
-
 import { createAppListenerMiddleware } from './listeners';
 import { createAnalyticsMiddleware } from './middleware/analytics';
 import { createCrashReporter } from './middleware/crash-reporter';
 import { createLoggerMiddleware } from './middleware/logger';
+import { defaultMiddlewareNames, readTraceSetting, traceChain } from './middleware/trace';
 import { rootReducer } from './rootReducer';
 import type { RootState } from './rootReducer';
 import type { ThunkExtra } from './thunk-types';
@@ -34,14 +33,30 @@ export function makeStore(preloadedState?: Partial<RootState>, extraOverrides?: 
   return configureStore({
     reducer: rootReducer,
     preloadedState,
-    // getDefaultMiddleware() = thunk (with our extra argument) + dev-only immutability & serializability checks (20.02)
     middleware: (getDefaultMiddleware) => {
-      const chain = getDefaultMiddleware({ thunk: { extraArgument: extra } })
+      const defaults = getDefaultMiddleware({ thunk: { extraArgument: extra } });
+      const chain = defaults
         .prepend(crashReporter, listeners.middleware) // crash reporter first: wraps all
         .concat(apiSlice.middleware, timer); // RTK Query: runs the requests, counts subscriptions, refetches (22.04)
-      return import.meta.env.DEV ? chain.concat(createLoggerMiddleware(), analytics) : chain.concat(analytics);
-    },
-    devTools: import.meta.env.DEV, // the Redux DevTools extension, development only (14.11 §5)
+      if (!import.meta.env.DEV) return chain.concat(analytics);
+
+      const devChain = chain.concat(createLoggerMiddleware(), analytics);
+      // Learning aid, OFF by default: localStorage.setItem('traceRedux', 'all') + reload → every dispatch's trip
+      // through this chain is printed in the console (middleware/trace.ts). The names follow the order above.
+      const trace = readTraceSetting();
+      if (trace) {
+        traceChain(devChain, [
+          'crashReporter',
+          'listenerMiddleware',
+          ...defaultMiddlewareNames(defaults.length),
+          'apiSlice.middleware',
+          'timer',
+          'logger',
+          'analytics',
+        ], trace);
+      }
+      return devChain;
+    }
   });
 }
 

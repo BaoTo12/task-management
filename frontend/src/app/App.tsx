@@ -32,8 +32,8 @@ export function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="login" element={<LoginPage />} />
-        {/* S24: every page below needs a session (the API answers 401 otherwise). One guard for all. */}
         <Route element={<RequireAuth />}>
+          {/* replace on both navigations means the redirect doesn't add an entry to the browser histor */}
           <Route index element={<Navigate to="/tasks" replace />} />
           <Route path="tasks" element={<TasksPage />} />
           <Route path="tasks/new" element={<NewTaskPage />} />

@@ -19,7 +19,7 @@ import { apiSlice } from '@/shared/api/apiSlice';
  * so RootState knows their state as OPTIONAL keys (they may not be injected yet).
  */
 // oxlint-disable-next-line typescript/no-empty-object-type -- filled by declaration merging
-export interface LazyLoadedSlices {}
+export interface LazyLoadedSlices { }
 
 /**
  * Each key of the root state is owned by one reducer (15.08). Since S22, SERVER data (tasks, categories)
@@ -33,7 +33,6 @@ export const rootReducer = combineSlices(apiSlice, {
   listPrefs: listPrefsReducer,
   ui: uiReducer,
   quickFind: quickFindReducer,
-  // ── Spring Boot era features ─────────────────────────────────────────────────────────────────────────────
   people: peopleReducer,                      // createSlice + createEntityAdapter + createAsyncThunk lifecycle
   activity: activityReducer,                  // buildCreateSlice with the asyncThunk creator
   notificationsUi: notificationsUiReducer,    // createReducer (no slice): actions defined elsewhere

@@ -9,7 +9,6 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import type { CreateTaskRequest, Page, UpdateTaskRequest } from '@/shared/domain/api-types';
 import { isCategory, isPageOf, isTask } from '@/shared/domain/guards';
 import type { Category, Task } from '@/shared/domain/types';
-
 import { axiosBaseQuery } from './axiosBaseQuery';
 import type { AxiosQueryArgs } from './axiosBaseQuery';
 import type { TaskQuery } from './tasks-api';
@@ -19,17 +18,12 @@ export interface ClearCompletedResult {
   failed: number[];
 }
 
-/**
- * Categories are stored NORMALISED in the cache (21.12 + 23): { ids, entities } instead of an array.
- * transformResponse runs the adapter once per response; lookups by id are then O(1) through the adapter's
- * selectors (categorySelectors.ts) instead of a hand-written id → category map.
- */
+
 export const categoriesAdapter = createEntityAdapter<Category>({
   sortComparer: (a, b) => a.name.localeCompare(b.name), // ids kept in name order: the sidebar needs no sort
 });
 export const initialCategoriesState = categoriesAdapter.getInitialState();
 
-/** "The membership of a task list": what creating or deleting a task changes (23.01). */
 export const TASK_LIST = { type: 'Task', id: 'LIST' } as const;
 
 type BaseQuery = (args: AxiosQueryArgs) => ReturnType<ReturnType<typeof axiosBaseQuery>>;
@@ -45,14 +39,13 @@ async function deleteEach(ids: number[], baseQuery: BaseQuery) {
 export const apiSlice = createApi({
   reducerPath: 'api', // where the cache lives in the root state: state.api
   baseQuery: axiosBaseQuery(),
-  // Every kind of cached data that a mutation can make stale (22.08).
+  // The labels used to manage cache data
   tagTypes: ['Task', 'Category', 'Comment'],
   // 22.06: refetch every SUBSCRIBED query when the tab regains focus or the network comes back, so a tab left
   // open for an hour doesn't show hour-old data. Needs setupListeners(store.dispatch) (app/store.ts).
   refetchOnFocus: true,
   refetchOnReconnect: true,
   endpoints: (build) => ({
-    // ── Queries: read, cached per argument ────────────────────────────────────
     getTasks: build.query<Page<Task>, TaskQuery>({
       query: (params) => ({ url: '/tasks', params, validate: (data) => isPageOf(data, isTask) }),
       // One tag per task it contains, plus the LIST tag for its membership (23.01).

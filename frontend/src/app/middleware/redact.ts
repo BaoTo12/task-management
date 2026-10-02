@@ -1,4 +1,3 @@
-/** Keys whose values must never reach logs, analytics or crash reports (16.08). */
 const SENSITIVE_KEY = /pass(word)?|token|secret|authorization|cookie|session|csrf|xsrf/i;
 
 export const REDACTED = '[REDACTED]';

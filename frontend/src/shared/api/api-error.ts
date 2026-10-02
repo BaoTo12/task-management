@@ -2,7 +2,6 @@ import axios from 'axios';
 
 import { isApiError } from '@/shared/domain/guards';
 
-/** What went wrong, from the UI's point of view (13.08). */
 export type ApiErrorKind =
   | 'http' // the server answered with a non-2xx status
   | 'timeout' // no answer within the client's timeout
@@ -87,11 +86,6 @@ export function isCancelled(error: unknown): boolean {
   return error instanceof ApiRequestError && error.kind === 'cancelled';
 }
 
-/**
- * A SERIALISABLE snapshot of an ApiRequestError (20.09). createAsyncThunk puts `rejectWithValue`
- * payloads INTO actions, and actions must be plain data (19.10): a class instance would trip RTK's
- * serializability check and break the DevTools.
- */
 export interface ApiErrorPayload {
   kind: ApiErrorKind;
   status: number | null;

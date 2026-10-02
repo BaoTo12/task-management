@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * The application's entry point. What used to be AppContextListener (build every service by hand, share them through
  * the ServletContext) is now Spring's job: every @Component/@Service/@Repository/@Controller under com.taskflow is
- * found by component scanning, created ONCE (singleton scope) and injected through its constructor.
+ * found by component scanning, created ONCE (singleton scope) and injected throu~gh its constructor.
  *
  *   @SpringBootApplication     = @Configuration + @EnableAutoConfiguration + @ComponentScan(com.taskflow)
  *   @ServletComponentScan      registers the classic @WebServlet classes in com.taskflow.web.servlet (the Servlet API is

@@ -21,15 +21,11 @@ import { Stack } from '@/shared/ui/styled/Stack';
 
 import { reportRenderError } from './middleware/crash-reporter';
 
-/**
- * Extending a styled component (09.06): the header's right-hand group is a Stack pushed to the end.
- * Replaces an inline `style={{ marginLeft: 'auto' }}`. `.attrs` fixes the Stack props this group always uses.
- */
+
 const HeaderActions = styled(Stack).attrs({ $direction: 'row', $gap: 3, $align: 'center' })`
   margin-left: auto;
 `;
 
-/** The shell shared by every page: header + nav, the current page (<Outlet/>), footer. */
 export function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

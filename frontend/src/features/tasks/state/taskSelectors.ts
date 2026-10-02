@@ -3,18 +3,11 @@
 // `selectTasks` / `selectTaskById` keeps working unchanged.
 
 import { createSelector } from '@reduxjs/toolkit';
-
 import type { RootState } from '@/app/rootReducer';
-
 import { apiSlice } from '@/shared/api/apiSlice';
 import type { TaskQuery } from '@/shared/api/tasks-api';
 import type { Task } from '@/shared/domain/types';
 
-/**
- * THE argument of the app's main list query. Every `useGetTasksQuery(LIST_QUERY)` shares one cache entry
- * (arguments are compared by value), and the selectors below read that same entry.
- * Until pagination arrives (S23), the list loads the first 100 tasks: the API's maximum page size.
- */
 export const LIST_QUERY: TaskQuery = { size: 100 };
 
 const NO_TASKS: Task[] = []; // one constant empty array: "no data yet" must be a STABLE reference (21.02)
@@ -39,7 +32,7 @@ export const selectTaskById = (state: RootState, id: number): Task | undefined =
 export const selectCachedTask = (state: RootState, id: number): Task | undefined =>
   selectTaskById(state, id) ?? apiSlice.endpoints.getTask.select(id)(state).data;
 
-export const selectTaskCount =(state: RootState): number => selectTasks(state).length;
+export const selectTaskCount = (state: RootState): number => selectTasks(state).length;
 
 /** A number (a primitive): `useSelector` compares it with ===, so no memoization needed (21.09). */
 export const selectOpenTaskCount = (state: RootState): number =>

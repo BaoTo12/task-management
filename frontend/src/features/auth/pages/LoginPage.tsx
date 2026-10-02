@@ -11,7 +11,6 @@ import { FormField } from '@/shared/ui/forms/FormField';
 import { useAuth } from '../context/auth-context';
 import { safeReturnTo } from '../model/safe-redirect';
 
-/** S24 (24.12): a real login. The server sets the HttpOnly session cookie; we only get the user back. */
 export function LoginPage() {
   const { user, login } = useAuth();
   const { t } = useTranslation();
@@ -22,7 +21,6 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  // 🛡 never navigate to an unvalidated returnTo (open redirect, 24.14)
   const returnTo = safeReturnTo(searchParams.get('returnTo'));
 
   if (user) return <Navigate to={returnTo} replace />; // already logged in (e.g. Back after login)
@@ -36,8 +34,8 @@ export function LoginPage() {
       navigate(returnTo, { replace: true });
     } catch (err) {
       // One message for "no such user" and "wrong password": the server doesn't say which, neither do we.
-      setError(errorMessage(err)); // BAD_CREDENTIALS → "Invalid username or password." / Vietnamese
-      setPassword(''); // never keep a rejected password on screen
+      setError(errorMessage(err));
+      setPassword('');
     } finally {
       setSubmitting(false);
     }

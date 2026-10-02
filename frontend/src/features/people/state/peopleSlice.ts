@@ -30,7 +30,10 @@ const peopleSlice = createSlice({
     usersReceived: peopleAdapter.upsertMany,
   },
   extraReducers: (builder) => {
+    // ORDER MATTERS in the builder: every addCase first, then addMatcher, then addDefaultCase. RTK throws
+    // "`builder.addCase` should only be called before calling `builder.addMatcher`" at store creation otherwise.
     builder
+      .addCase(loggedOut, () => initialState)
       // The lifecycle actions createAsyncThunk generates. meta.arg is the argument the thunk was called with.
       .addCase(fetchMissingUsers.pending, (state, action) => {
         state.requested.push(...action.meta.arg.filter((id) => !state.requested.includes(id)));
@@ -45,8 +48,7 @@ const peopleSlice = createSlice({
       // RTK Query results feed the same table: a person found by the picker is known everywhere.
       .addMatcher(usersApi.endpoints.searchUsers.matchFulfilled, (state, action) => {
         peopleAdapter.upsertMany(state, action.payload);
-      })
-      .addCase(loggedOut, () => initialState);
+      });
   },
 });
 
