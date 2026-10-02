@@ -1,7 +1,6 @@
 import { useActionState, useId } from 'react';
 import { useFormStatus } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { PAGE_SIZES, pageSizeChanged } from '@/features/listPrefs';
@@ -15,26 +14,7 @@ import { isRememberLastTaskEnabled, setRememberLastTaskEnabled } from '../model/
 import { parseSettings } from '../model/settings-form';
 import type { SettingsErrors } from '../model/settings-form';
 
-const Fieldset = styled.fieldset`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.space(4)};
-  margin: 0;
-  padding: ${({ theme }) => theme.space(3)} ${({ theme }) => theme.space(4)};
-  border: 1.5px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-
-  legend {
-    padding: 0 ${({ theme }) => theme.space(1)};
-    font-weight: ${({ theme }) => theme.fontWeights.medium};
-  }
-
-  label {
-    display: inline-flex;
-    align-items: center;
-    gap: ${({ theme }) => theme.space(2)};
-  }
-`;
+import { Fieldset } from './SettingsPage.styles';
 
 /** What the action returns, and therefore what `useActionState` holds between submissions. */
 type SaveState = { status: 'idle' } | { status: 'saved' } | { status: 'invalid'; errors: SettingsErrors };

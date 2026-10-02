@@ -1,51 +1,18 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { LIST_QUERY } from '@/features/tasks';
 
 import { useGetTasksQuery } from '@/shared/api/apiSlice';
 import { useToday } from '@/shared/hooks/useToday';
-import { media } from '@/shared/ui/styled/media';
 import { LoadingBlock, Spinner } from '@/shared/ui/styled/Spinner';
 
 import { CompletionWidget, OverdueWidget, PriorityWidget, StatusWidget } from '../components/DashboardWidgets';
 import { selectHiddenWidgets, WIDGET_IDS, widgetToggled } from '../state/dashboardSlice';
 import type { WidgetId } from '../state/dashboardSlice';
 
-/** One column on phones, two from the md breakpoint: the `media` helper instead of a CSS Module + respond-to(). */
-const WidgetGrid = styled.div`
-  display: grid;
-  gap: ${({ theme }) => theme.space(4)};
-  grid-template-columns: 1fr;
-
-  ${media.md`
-    grid-template-columns: repeat(2, 1fr);
-  `}
-`;
-
-const Customize = styled.fieldset`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.space(3)};
-  align-items: center;
-  margin: 0 0 ${({ theme }) => theme.space(6)};
-  padding: ${({ theme }) => theme.space(3)} ${({ theme }) => theme.space(4)};
-  border: 1.5px dashed ${({ theme }) => theme.colors.borderStrong};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-
-  legend {
-    padding: 0 ${({ theme }) => theme.space(1)};
-  }
-
-  label {
-    display: inline-flex;
-    align-items: center;
-    gap: ${({ theme }) => theme.space(2)};
-  }
-`;
+import { Customize, WidgetGrid } from './DashboardPage.styles';
 
 /** How often the dashboard re-asks the server while it is open (other people change tasks too). */
 const POLL_MS = 60_000;

@@ -2,8 +2,7 @@ import { skipToken } from '@reduxjs/toolkit/query/react';
 import { Menu } from 'lucide-react';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router';
-import styled from 'styled-components';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 
 import { useAuth } from '@/features/auth';
 import { NotificationBell } from '@/features/notifications';
@@ -17,132 +16,22 @@ import { useMediaQuery } from '@/shared/hooks/useMediaQuery';
 import { ThemeToggle } from '@/shared/theme/ThemeToggle';
 import { theme as appTheme } from '@/shared/theme/theme';
 import { BrandMark } from '@/shared/ui/BrandMark';
-import { Button } from '@/shared/ui/Button';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
-import { media } from '@/shared/ui/styled/media';
 
 import { reportRenderError } from './middleware/crash-reporter';
 import { Sidebar } from './shell/Sidebar';
 
-/**
- * The app shell, mobile first:
- *   phone/tablet   top bar (menu · brand · actions) + search on its own row; the sidebar is a drawer
- *   desktop (lg+)  graphite sidebar | top bar (search · actions) over the page
- */
-const Shell = styled.div`
-  min-height: 100dvh;
-
-  ${media.lg`
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-  `}
-`;
-
-const Column = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 100dvh;
-`;
-
-const Topbar = styled.header`
-  position: sticky;
-  top: 0;
-  z-index: ${({ theme }) => theme.zIndices.header};
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  grid-template-areas:
-    'menu brand . actions'
-    'search search search search';
-  align-items: center;
-  gap: ${({ theme }) => `${theme.space(3)} ${theme.space(2)}`};
-  padding: ${({ theme }) => `${theme.space(3)} ${theme.space(4)}`};
-  background: color-mix(in srgb, ${({ theme }) => theme.colors.background} 88%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-
-  ${media.md`
-    grid-template-columns: auto auto minmax(0, 28rem) 1fr auto;
-    grid-template-areas: 'menu brand search . actions';
-    padding: ${({ theme }) => `${theme.space(3)} ${theme.space(6)}`};
-  `}
-
-  ${media.lg`
-    grid-template-columns: minmax(0, 30rem) 1fr auto;
-    grid-template-areas: 'search . actions';
-    padding: ${({ theme }) => `${theme.space(3)} ${theme.space(8)}`};
-  `}
-`;
-
-/** The design system's square icon button, placed in the grid and hidden once the sidebar is permanent. */
-const MenuButton = styled(Button)`
-  grid-area: menu;
-
-  ${media.lg`
-    display: none;
-  `}
-`;
-
-const MobileBrand = styled(Link)`
-  grid-area: brand;
-  display: inline-flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.space(2)};
-  color: ${({ theme }) => theme.colors.text};
-  font-family: ${({ theme }) => theme.fonts.display};
-  font-size: 1.15rem;
-  font-weight: ${({ theme }) => theme.fontWeights.bold};
-  text-decoration: none;
-
-  ${media.lg`
-    display: none;
-  `}
-`;
-
-const SearchSlot = styled.div`
-  grid-area: search;
-  min-width: 0;
-`;
-
-const Actions = styled.div`
-  grid-area: actions;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: ${({ theme }) => theme.space(2)};
-  min-width: 0;
-`;
-
-const Main = styled.main`
-  flex: 1;
-  width: 100%;
-  max-width: 1240px;
-  padding: ${({ theme }) => `${theme.space(6)} ${theme.space(4)} ${theme.space(12)}`};
-
-  &:focus {
-    outline: none;
-  }
-
-  ${media.md`
-    padding: ${({ theme }) => `${theme.space(8)} ${theme.space(6)} ${theme.space(16)}`};
-  `}
-
-  ${media.lg`
-    padding: ${({ theme }) => `${theme.space(8)} ${theme.space(8)} ${theme.space(16)}`};
-  `}
-`;
-
-/** Dims the page behind the open drawer; a click on it closes the drawer. */
-const Backdrop = styled.div`
-  position: fixed;
-  inset: 0;
-  z-index: calc(${({ theme }) => theme.zIndices.drawer} - 1);
-  background: ${({ theme }) => theme.colors.scrim};
-
-  ${media.lg`
-    display: none;
-  `}
-`;
+import {
+  Actions,
+  Backdrop,
+  Column,
+  Main,
+  MenuButton,
+  MobileBrand,
+  SearchSlot,
+  Shell,
+  Topbar,
+} from './AppLayout.styles';
 
 export function AppLayout() {
   const { user, logout } = useAuth();

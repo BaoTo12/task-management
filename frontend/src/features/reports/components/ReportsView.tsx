@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 
 import { formatDate, formatPercent } from '@/shared/i18n/format';
 import { Button } from '@/shared/ui/Button';
@@ -10,6 +9,8 @@ import type { ReportsViewModel } from '../legacy/selectors';
 
 import styles from './ReportsView.module.scss';
 
+import { Bar, Row } from './ReportsView.styles';
+
 /**
  * PRESENTATIONAL ("dumb") component: props in, JSX out. It knows nothing about Redux; ReportsContainer connects it.
  * The container/presentational split was THE classic React-Redux pattern before hooks.
@@ -19,22 +20,6 @@ export interface ReportsViewProps extends ReportsViewModel {
   onChartModeChange: (mode: ChartMode) => void;
   onRefresh: () => void;
 }
-
-const Bar = styled.span<{ $share: number }>`
-  display: inline-block;
-  height: 0.75rem;
-  width: ${({ $share }) => Math.round($share * 100)}%;
-  min-width: 2px;
-  background: ${({ theme }) => theme.colors.primary};
-  border-radius: 2px;
-`;
-
-const Row = styled.div`
-  display: grid;
-  grid-template-columns: 8rem 1fr 3rem;
-  gap: 0.5rem;
-  align-items: center;
-`;
 
 export function ReportsView(props: ReportsViewProps) {
   const { status, error, summary, filters, chartMode, completionRate, statusRows, priorityRows, busiestDay, daySeries } = props;

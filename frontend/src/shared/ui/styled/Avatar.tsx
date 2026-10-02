@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { Circle } from './Avatar.styles';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
 const SIZE_PX: Record<AvatarSize, number> = { sm: 24, md: 32, lg: 48 };
@@ -21,19 +21,6 @@ function initials(name: string): string {
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
 }
-
-const Circle = styled.span<{ $size: number; $color: string }>`
-  display: inline-grid;
-  place-items: center;
-  width: ${({ $size }) => $size}px;
-  height: ${({ $size }) => $size}px;
-  border-radius: 50%;
-  background: ${({ $color }) => $color};
-  color: ${({ theme }) => theme.colors.onInk};
-  font-size: ${({ $size }) => Math.round($size * 0.4)}px;
-  font-weight: ${({ theme }) => theme.fontWeights.semibold};
-  user-select: none;
-`;
 
 interface AvatarProps {
   name: string;

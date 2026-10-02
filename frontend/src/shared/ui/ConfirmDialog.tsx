@@ -1,8 +1,9 @@
 import { useId, useImperativeHandle, useRef, useState } from 'react';
 import type { Ref } from 'react';
-import styled from 'styled-components';
 
 import { Button } from './Button';
+
+import { Actions, Dialog } from './ConfirmDialog.styles';
 
 export interface ConfirmOptions {
   title: string;
@@ -16,33 +17,6 @@ export interface ConfirmOptions {
 export interface ConfirmDialogHandle {
   confirm: (options: ConfirmOptions) => Promise<boolean>;
 }
-
-const Dialog = styled.dialog`
-  max-width: min(420px, calc(100vw - 32px));
-  padding: ${({ theme }) => theme.space(5)};
-  /* An inked sticker, like a lifted card: the dialog is the one thing to deal with right now. */
-  border: 1.5px solid ${({ theme }) => theme.colors.ink};
-  border-radius: ${({ theme }) => theme.radii.lg};
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  box-shadow: ${({ theme }) => theme.shadows.ink};
-
-  &::backdrop {
-    background: ${({ theme }) => theme.colors.scrim};
-  }
-
-  h2 {
-    margin: 0 0 ${({ theme }) => theme.space(2)};
-    font-size: ${({ theme }) => theme.fontSizes.lg};
-  }
-`;
-
-const Actions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${({ theme }) => theme.space(2)};
-  margin-top: ${({ theme }) => theme.space(4)};
-`;
 
 /**
  * A replacement for window.confirm(): styled, translated, accessible (native <dialog> = focus trap, Esc, top layer).

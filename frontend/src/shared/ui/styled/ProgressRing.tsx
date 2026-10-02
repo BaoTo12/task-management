@@ -1,56 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import styled, { keyframes } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
-const SIZE = 72;
-const STROKE = 8;
-const RADIUS = (SIZE - STROKE) / 2;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-
-/** Threshold colours from the theme: danger below 34%, warning below 67%, success otherwise. */
-function ringColor(percent: number, theme: DefaultTheme): string {
-  if (percent < 34) return theme.colors.danger;
-  if (percent < 67) return theme.colors.warning;
-  return theme.colors.success;
-}
-
-const appear = keyframes`
-  from { stroke-dashoffset: ${CIRCUMFERENCE}; }
-`;
-
-const Wrapper = styled.figure`
-  position: relative;
-  width: ${SIZE}px;
-  height: ${SIZE}px;
-  margin: 0;
-`;
-
-const Arc = styled.circle<{ $offset: number; $percent: number }>`
-  fill: none;
-  stroke: ${({ $percent, theme }) => ringColor($percent, theme)};
-  stroke-width: ${STROKE};
-  stroke-linecap: round;
-  stroke-dasharray: ${CIRCUMFERENCE};
-  stroke-dashoffset: ${({ $offset }) => $offset};
-  transform: rotate(-90deg);
-  transform-origin: 50% 50%;
-  transition: stroke-dashoffset 300ms ease, stroke 300ms ease;
-  animation: ${appear} 600ms ease-out;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-    transition: none;
-  }
-`;
-
-const Label = styled.figcaption`
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: 0.875rem;
-  font-weight: 600;
-`;
+import { Arc, CIRCUMFERENCE, Label, RADIUS, SIZE, STROKE, Wrapper } from './ProgressRing.styles';
 
 interface ProgressRingProps {
   done: number;
